@@ -1,0 +1,155 @@
+@import 'https://fonts.googleapis.com/css2?family=Cookie&family=Montserrat:wght@400;500&display=swap';
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    background-color: #fafafa;
+    align-items: center;
+    align-content: center;
+    font-family: 'Montserrat';
+    overflow: hidden;
+}
+
+body {
+    background-color: #fafafa;
+}
+
+header {
+    display: flex;
+    position: fixed;
+    width: 100%;
+    height: 8vh;
+    top: 0;
+    border-bottom: 1px solid rgb(219, 219, 219);
+    align-items: center;
+    align-content: center;
+    background-color: #fff;
+    justify-content: center;
+}
+
+a {
+    text-decoration: none;
+    color: #000;
+}
+
+header section {
+    display: flex;
+    justify-content: space-between;
+    width: 60%;
+    background-color: #fff;
+}
+
+.logo-name {
+    font-family: 'Cookie', cursive;
+    font-size: 45px;
+    background-color: #fff;
+}
+
+.header-icons {
+    display: flex;
+    background-color: #fff;
+}
+
+.header-icons img {
+    width: 25px;
+    height: 25px;
+    object-fit: cover;
+    background-color: #fff;
+}
+
+.header-icons a {
+    width: 25px;
+    height: 25px;
+    background-color: #fff;
+    margin-left: 20px;
+}
+
+.user-avatar {
+    border-radius: 50%;
+}
+
+.main-section {
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: 50%;
+    height: 85vh;
+    margin: auto;
+    margin-top: 12vh;
+    border: 1px solid rgb(189, 189, 189);
+    border-radius: 15px;
+}
+
+.photo-section {
+    min-width: 50%;
+    min-height: 70%;
+    max-width: 90%;
+    max-height: 85%;
+}
+
+.img {
+    max-width: 100%;
+    width: 100%;
+    height: 80%;
+    border-radius: 5px;
+    max-height: 75vh;
+    object-fit: contain;
+}
+
+.owner-block {
+    display: flex;
+    background-color: #fafafa;
+    width: 100%;
+    height: 13%;
+}
+
+.owner-avatar {
+    width: 40px;
+    height: 40px;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+.owner-username {
+    margin-left: 12px;
+}
+
+.under-post {
+    width: 85%;
+    margin-top: 10px;
+}
+
+.comment-text {
+    margin-top: 10px;
+    font-size: 14px;
+}
+
+.show-comments {
+    margin-top: 10px;
+    color: gray;
+    cursor: pointer;
+}
+
+.copy {
+    margin-left: 10px;
+    cursor: pointer;
+}
+
+.like {
+    cursor: pointer;
+}
+
+.delete {
+    width: 23px;
+    margin-left: 10px;
+    cursor: pointer;
+}
+
+.post-pic {
+    width: 100%;
+    object-fit: contain;
+    border-radius: 5px;
+    height: 85%;
+}

@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <title>Instyle</title>
+    <link rel="stylesheet" href="{% static "css/main-page.css" %}" />
+    <link rel="shortcut icon" type="image/x-icon" href="{% static "img/system/title-logo.png" %}" />
+  </head>
+  <body>
+    <header>
+      <section>
+        <a href="/"><p class="logo-name">Instyle</p></a>
+        <div class="header-icons">
+          <a href="/"><img src="{% static "img/system/home-fill.svg" %}" alt="Главная страница" title="Главная страница"></a>
+          <a href="/chat"><img src="{% static "img/system/chat-empty.svg" %}" alt="Мессенджер" title="Мессенджер"></a>
+          <a href="/post"><img src="{% static "img/system/add-empty.svg" %}" alt="Добавить фотографию" title="Добавить фотографию"></a>
+          <a href="/recommendation"><img src="{% static "img/system/compass-empty.svg" %}" alt="Рекомендуемое" title="Рекомендуемое"></a>
+          <a href="/notification"><img src="{% static "img/system/notification-empty.svg" %}" alt="Уведомления" title="Уведомления"></a>
+          </div>
+      </section>
+    </header>
+    <canvas class="background"> </canvas>
+
+    <section class="main-section" id="main-section">
+
+    </section>
+
+  <script src = "https://cdnjs.cloudflare.com/ajax/libs/particlesjs/2.2.3/particles.min.js"></script>
+  <script src="{% static "js/main-page-listener.js" %}"></script>
+  <script>
+    window.onload = function() {
+      const colors = ['#F9D423', '#FF4E50', '#BB377D', '#8CA6DB', '#00d2ff', '#FC354C', '#480048', '#FF8008', '#1FA2FF']
+      let random_color = Math.floor(Math.random() * ((colors.length-1) + 1))
+      Particles.init({
+          selector: '.background',
+          color: colors[random_color],
+          connectParticles: 'true',
+          maxParticles: 130,
+          speed: 0.25,
+      });
+    };
+  </script>
+ <script src="//code.jquery.com/jquery-2.0.2.min.js"></script>
+  <!-- <script src="/socket.io/socket.io.js"></script> -->
+  <script src="{% static "js/sockets.js" %}"></script>
+   <script src="{% static "js/sweetalert2.all.min.js" %}"></script>
+    <script>
+      function like (el, id_img) {
+        fetch(`post/like/${id_img}`, {
+        method: "post",
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+      });
+      const count = document.getElementById(`likes_${id_img}`);
+
+      if (el.src.indexOf('notification') > -1) {
+        el.src = "../img/system/liked.svg";
+        count.attributes.likes.value = ++count.attributes.likes.value;
+      }
+      else {
+        count.attributes.likes.value = --count.attributes.likes.value;
+        el.src = "../img/system/notification-empty.svg";
+      }
+      count.innerHTML = `Отметок нравится: ${count.attributes.likes.value}`;
+      }
+
+      function copy (link) {
+        navigator.clipboard.writeText(`${window.location.origin}${link}`)
+          .then(() => {
+             Swal.fire({
+              position: 'top',
+              icon: 'success',
+              title: 'Ссылка на пост была скопирована',
+              showConfirmButton: false,
+              timer: 1000
+            })
+          })
+          .catch(err => {
+              Swal.fire({
+                position: 'top',
+                icon: 'error',
+                title: 'Упс, что-то пошло не по плану. Сообщите об этом нам',
+                showConfirmButton: false,
+                timer: 2000
+              })
+          });
+      }  
+     
+    </script>
+  </body>
+</html>
