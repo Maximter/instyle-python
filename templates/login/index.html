@@ -15,7 +15,7 @@
       <p class="logo-name">Instyle</p>
       <form action="/login/login/" method="post">
         {% csrf_token %}
-        <input type="text" name="username" placeholder="Имя пользователя или эл. адрес" id="username" required>
+        <input type="text" name="username" placeholder="Имя пользователя" id="username" required>
         <input type="password" name="password" placeholder="Пароль" id="password" required>
         <button>Войти</button>
         <a href="https://oauth.yandex.ru/authorize?response_type=code&client_id=a8fc1d2ca1434b31b9e36b8ef23d4f35" class="yandex-link"><img src="{% static "img/system/yandex-button.svg" %}" alt="Вход через Яндекс" class="yandex-button"></a>

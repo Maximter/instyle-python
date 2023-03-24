@@ -25,10 +25,11 @@ def login(request):
         context = {
             'err': user_exist['err'],
             'warn': user_exist['warn'],
-            'user': user_exist['user']
+            'user': user_exist['user'] 
         }
         return render(request, 'login/index.html', context=context,)
     
     response = HttpResponseRedirect('/')
     response.set_cookie(key='instyle_token', value=get_token(user_exist['user_model']))
     return response
+ 
