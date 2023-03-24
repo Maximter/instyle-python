@@ -13,7 +13,8 @@
     <section>
       <div class="circle"></div>
       <p class="logo-name">Instyle</p>
-      <form action="/signup" method="post">
+      <form action="/signup/create/" method="post">
+        {% csrf_token %}
         <input type="email" name="email" placeholder="Эл. адрес" id="email" required>
         <input type="text" name="name_lastname" placeholder="Имя и фамилия" id="name_lastname" required>
         <input type="text" name="username" placeholder="Имя пользователя" id="username" required>
@@ -23,13 +24,11 @@
       <p class="havent-account">Уже есть аккаунт? <a href="/login">Войти</a></p>
     </section>
 
-
-
  <script src = "https://cdnjs.cloudflare.com/ajax/libs/particlesjs/2.2.3/particles.min.js"></script>
  <script>
     window.onload = function() {
       const circle = document.querySelector('.circle');
-      const colors = ['#F9D423', '#FF4E50', '#BB377D', '#8CA6DB', '#00d2ff', '#FC354C', '#480048', '#FF8008', '#1FA2FF']
+      const colors = ['#F9D423', '#FF4E50', '#BB377D', '#8CA6DB', '#00d2ff', '#FC354C', '#e0007b', '#FF8008', '#1FA2FF']
       let random_color = Math.floor(Math.random() * ((colors.length-1) + 1))
 
       circle.style.border = `3px solid ${colors[random_color]}`;
@@ -65,7 +64,7 @@
     <script>
      Swal.fire({
         title: 'Регистрация',
-        text: '{{success}}',
+        text: 'Вы были успешно зарегистрированы. Для получения доступа к сервису, была выслана ссылка на эл. адрес для его подтверждения',
         icon: 'success',
         confirmButtonText: 'Продолжить'
       }).then((result) => {

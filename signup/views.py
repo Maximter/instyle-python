@@ -1,16 +1,24 @@
 from django.shortcuts import render
+from django.views.decorators.csrf import csrf_protect
+from .models import User
+from .service import valid_user, create_user
 
 
 def index(request):
-    icecreams = ''
-    friends = ''
-    city_weather = ''
-    friend_output = ''
+    return render(request, 'signup/index.html')
 
-    context = {
-        'icecreams': icecreams,
-        'friends': friends,
-        'friend_output': friend_output,
-        'city_weather': city_weather,
+@csrf_protect
+def create(request):
+    user: User = {
+        'email': request.POST.get('email').strip(),
+        'name_lastname': request.POST.get('name_lastname').strip(),
+        'username': request.POST.get('username').strip(),
+        'password': request.POST.get('password').strip(),
     }
-    return render(request, 'signup/index.html', context)
+
+    err_valid_user = valid_user(user)
+    if err_valid_user:
+        return render(request, 'signup/index.html', context={'err': err_valid_user})
+    else: create_user(user)
+    
+    return render(request, 'signup/index.html', context={'success': True})
