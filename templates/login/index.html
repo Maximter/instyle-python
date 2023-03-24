@@ -13,7 +13,8 @@
     <section>
       <div class="circle"></div>
       <p class="logo-name">Instyle</p>
-      <form action="/login" method="post">
+      <form action="/login/login/" method="post">
+        {% csrf_token %}
         <input type="text" name="username" placeholder="Имя пользователя или эл. адрес" id="username" required>
         <input type="password" name="password" placeholder="Пароль" id="password" required>
         <button>Войти</button>

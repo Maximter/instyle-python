@@ -107,6 +107,7 @@ form button:active {
     font-weight: 500;
     color: #0095f6;
     text-decoration: none;
+    background-color: #fff;
 }
 
 .yandex-button {

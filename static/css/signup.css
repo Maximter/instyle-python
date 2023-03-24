@@ -100,10 +100,12 @@ form button:active {
 .havent-account {
     margin-top: 18px;
     font-size: 13px;
+    background-color: #fff;
 }
 
 .havent-account a {
     font-weight: 500;
     color: #0095f6;
-    text-decoration: none
+    text-decoration: none;
+    background-color: #fff;
 }

@@ -1,6 +1,6 @@
 import re
 from .models import User, Token
-from django.contrib.auth.hashers import make_password, check_password
+from django.contrib.auth.hashers import make_password
 
 def valid_user(user: User): 
     if not user['email'] or not user['name_lastname'] or not user['username'] or not user['password']:
@@ -39,10 +39,8 @@ def valid_user(user: User):
     
     return ''
 
-
 def create_user(user):
     hash_password = make_password(user['password'])
-    # validate = check_password(user['password'], hash_password)
     user = User.objects.create_user(email = user['email'], name_lastname = user['name_lastname'], 
                                     username = user['username'], password = hash_password)
     Token.objects.create_token(user = user)
