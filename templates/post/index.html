@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <title>Instyle</title>
+    <link rel="stylesheet" type="text/css"  href="{% static 'css/post.css' %}"/>
+    <link rel="shortcut icon" type="image/x-icon" href="{% static 'img/system/title-logo.png' %}" />
+  </head>
+  <body>
+    <header>
+      <section>
+        <a href="/"><p class="logo-name">Instyle</p></a>
+        <div class="header-icons">
+          <a href="/"><img src="{% static 'img/system/home-empty.svg' %}"alt="Главная страница" title="Главная страница"></a>
+          <a href="/chat"><img src="{% static 'img/system/chat-empty.svg' %}" alt="Мессенджер" title="Мессенджер"></a>
+          <a href="/post"><img src="{% static 'img/system/add-fill.svg' %}" alt="Добавить фотографию" title="Добавить фотографию"></a>
+          <a href="/recommendation"><img src="{% static 'img/system/compass-empty.svg' %}" alt="Рекомендуемое" title="Рекомендуемое"></a>
+          <a href="/notification"><img src="{% static 'img/system/notification-empty.svg' %}" alt="Уведомления" title="Уведомления"></a>
+          <a href="/user/{{user.username}}">
+            {%if user.avatar%}
+            <img src="{% static 'img/small/avatar/{{user.id}}.png' %}" alt="{{user.name_lastname}}" title="{{user.name_lastname}}" class="user-avatar" id="upper-avatar">
+            {%else%}
+            <img src="{% static 'img/small/avatar/standard.png' %}" alt="{{user.name_lastname}}" title="{{user.name_lastname}}" class="user-avatar" id="upper-avatar">
+            {%endif%}
+          </a>
+        </div>
+      </section>
+    </header>
+    <form action="/post/create/" method="post" enctype="multipart/form-data" class="main-section">
+        {% csrf_token %}
+      <div class="photo-section">
+        <div style="display: none;" id="uploaded_image_block" class="uploaded-image-block">
+           <img src="#" class="uploaded-image" id="uploaded_image" >
+        </div>
+       
+
+        <div class="photo-section-about">
+          <img src="{% static 'img/system/paste-photo.svg' %}" alt="Прикрепите фотографию" title="Прикрепите фотографию">
+          <p class="paste-photo-text">Выберете фотографию или видео с устройства</p>
+          <input type="file" class="input__file" name="photo" id="input_file" accept=".jpeg,.jpg,.gif,.mp4">
+          <label for="input_file" class="input__file-button">
+              <span class="input__file-button-text">Прикрепить файл</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="post-info">
+        <div class="post-info-user">
+          <a href="/user/{{user.username}}">
+            {%if user.avatar%}
+            <img src="{% static 'img/small/avatar/{{user.id}}.png' %}" alt="{{user.name_lastname}}" title="{{user.name_lastname}}" class="user-avatar-info">
+            {%else%}
+            <img src="{% static 'img/small/avatar/standard.png' %}" alt="{{user.name_lastname}}" title="{{user.name_lastname}}" class="user-avatar-info">
+            {%endif%}
+        </a>
+          <p class="user-info-name_lastname">{{user.name_lastname}}</p>
+        </div>
+
+        
+          <textarea type="text" class="post-info-textbox" placeholder="Напишите описание к фотографии..." id="comment" name="comment"></textarea> <br>
+          <div class="buttons-block">
+             <button class="save-post">Сохранить</button>
+             <div class="delete-post" id="delete">Удалить</div>
+          </div>
+      </div>
+    </form>
+    <script src="{% static 'js/sweetalert2.all.min.js' %}" ></script>
+    <script src="{% static 'js/upload-image.js' %}"></script>
+    <script src="{% static 'js/post-img-buttons.js' %}"></script>
+    {%if err%}
+      <script>
+        document.getElementById('comment').value = '{{comment}}';
+        uploaded_image_block.style.display = "none"
+        uploaded_image.src = "#"
+
+        Swal.fire({
+          title: 'Ошибка',
+          text: '{{err}}',
+          icon: 'error',
+          confirmButtonText: 'Повторить попытку'
+        })
+      </script>
+    {%endif%}
+
+    
+    {%if success%}
+      <script>
+        uploaded_image_block.style.display = "none"
+        uploaded_image.src = "#"
+
+        Swal.fire({
+          title: 'Готово',
+          text: '{{success}}',
+          icon: 'success',
+          confirmButtonText: 'Хорошо'
+        }).then((result) => {
+        if (result.isConfirmed) window.location.href = '/user/{{user.username}}'
+      })
+      </script>
+     {%endif%}
+
+    <script src="/socket.io/socket.io.js"></script>
+  <script src="../js/sockets.js"></script>
+  </body>
+</html>
