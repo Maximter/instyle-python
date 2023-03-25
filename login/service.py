@@ -39,5 +39,8 @@ def check_user_exist(user):
     return user_exist
 
 def get_token(user):
-    token = Token.objects.get(user=user.id)
+    try:
+        token = Token.objects.get(user=user.id)
+    except Token.DoesNotExist:
+        return None
     return token.token

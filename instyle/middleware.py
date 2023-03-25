@@ -11,9 +11,8 @@ def simple_middleware(get_response):
             return response
             
         token = request.COOKIES.get('instyle_token')
-        token_model = {}
         try:
-            token_model = Token.objects.get(token=token)
+            Token.objects.get(token=token)
         except Token.DoesNotExist:
             response = HttpResponseRedirect('/login/')
     
