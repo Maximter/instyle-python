@@ -1,6 +1,6 @@
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
-from .service import get_user_by_token, get_owner
+from .service import get_posts, get_user_by_token, get_owner
 
 def index(request):
     response = HttpResponseRedirect('/')
@@ -19,8 +19,9 @@ def user_page(request, username):
         #   if (follow) user['follow'] = true;
 
     # const follows = await this.userService.getfollows(owner);
-    # const posts = await this.userService.getPosts(owner);
-    # owner['countPost'] = posts.length;
+    posts = get_posts(owner)
+    if posts is not None:
+        owner.countPost = len(posts)
     # owner['followers'] = follows['follower'];
     # owner['followings'] = follows['following'];
     # owner['countFollowers'] = follows['follower'].length;
@@ -30,6 +31,6 @@ def user_page(request, username):
     context = {
         'user': user,
         'owner': owner,
-        # 'posts': posts,
+        'posts': posts,
     }
     return render(request, 'user/index.html', context)

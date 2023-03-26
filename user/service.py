@@ -1,3 +1,4 @@
+from post.models import Post
 from signup.models import Token, User
 
 def get_user_by_token(token):
@@ -13,3 +14,10 @@ def get_owner(username):
     except User.DoesNotExist:
         return None
     return owner
+
+def get_posts(user):
+    try:
+        posts = Post.objects.filter(user=user).order_by('-id')
+    except User.DoesNotExist:
+        return None
+    return posts

@@ -72,19 +72,15 @@
 
     <section class="main-section" id="main-section">
       <ul>
-        {%for this in post%}
+        {%for this in posts%}
           <li>
-            <a href="/post/{{this.id_img}}">
-                {%if this.gif%}
-                 <img src="{% static 'img/gif/{{this.id_img}}.gif' %}" class="post-pic">
-                {%else%}
-                  {%if this.mp4%}
+            <a href="/post/{{this.id_post}}">
+                {%if this.mp4%}
                   <video class="post-pic" style="object-fit: cover;">
-                    <source src="{% static 'img/video/{{this.id_img}}.mp4' %}" type='video/mp4;'>
+                    <source src="static/img/video/{{this.user.id}}/{{this.id_post}}.mp4" type='video/mp4;'>
                   </video>
-                  {%else%}
-                <img src="{% static 'img/small/post/{{this.id_img}}.jpg' %}" class="post-pic">
-                {%endif%}
+                {%else%}
+                  <img src="/static/img/small/post/{{this.user.id}}/{{this.id_post}}.jpg" class="post-pic">
                 {%endif%}
             </a>
           </li>
