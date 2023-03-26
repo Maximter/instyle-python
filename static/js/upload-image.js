@@ -6,10 +6,10 @@ const uploaded_image_block = document.getElementById('uploaded_image_block');
 input_image.onchange = () => {
     const [file] = input_image.files
     if (file) {
-        if (file.size > 1024 * 1024 * 75) {
+        if (file.size > 1024 * 1024 * 150) {
             Swal.fire({
                 title: 'Ошибка',
-                text: 'Загружаемый файл слишком большой. Максимально разрешенный размер файла: 75Мб',
+                text: 'Загружаемый файл слишком большой. Максимально разрешенный размер файла: 150Мб',
                 icon: 'error',
                 confirmButtonText: 'Хорошо'
               })

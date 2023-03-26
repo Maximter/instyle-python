@@ -177,6 +177,7 @@ header section {
     border: 1px solid rgb(169, 169, 169);
     border-radius: 5px;
     padding: 9px;
+    overflow-y: auto;
 }
 
 .buttons-block {
