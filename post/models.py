@@ -24,3 +24,30 @@ class Post(models.Model,):
     
     class Meta:
         db_table = 'post'
+
+
+class Post_interactionManage(models.Manager):
+    def create_like(self, post, user):
+        post = self.create(post=post, user=user, like=True)
+        return post
+    
+    def create_comment(self, post, user, comment):
+        post = self.create(post=post, user=user, comment=comment)
+        return post
+
+class Post_interaction(models.Model,):
+    post = models.ForeignKey(
+        Post, 
+        on_delete=models.CASCADE,
+    )
+    user = models.ForeignKey(
+        User, 
+        on_delete=models.CASCADE,
+    )
+    like = models.BooleanField(default=False)
+    comment = models.CharField(default='', max_length=1500)
+    date_comment = models.DateTimeField(default=timezone.now)
+    objects = Post_interactionManage()
+    
+    class Meta:
+        db_table = 'post_interaction'

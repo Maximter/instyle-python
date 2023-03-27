@@ -186,11 +186,12 @@ ul {
     display: flex;
     flex-wrap: wrap;
     width: 100%;
+    justify-content: center;
 }
 
 li {
-    width: 256px;
-    height: 256px;
+    width: 250px;
+    height: 250px;
     list-style-type: none;
     margin: 20px;
     border: 1px solid rgb(219, 219, 219);

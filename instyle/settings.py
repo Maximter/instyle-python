@@ -27,6 +27,8 @@ SECRET_KEY = 'django-insecure-95*tk@7aw8k1$#*0i93if-%$7arfk54ay!w+yw_fc+zlc^15yd
 DEBUG = True
 
 ALLOWED_HOSTS = []
+# CSRF_COOKIE_DOMAIN = []
+
 
 
 # Application definition

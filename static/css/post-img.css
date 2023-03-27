@@ -1,5 +1,22 @@
 @import 'https://fonts.googleapis.com/css2?family=Cookie&family=Montserrat:wght@400;500&display=swap';
 
+  * {
+    scrollbar-width: thin;         
+    scrollbar-color: #8E8E8E #E5E5E5;  
+  }
+
+  *::-webkit-scrollbar {
+    width: 6px;            
+  }
+  *::-webkit-scrollbar-track {
+    background: #E5E5E5;  
+    border-radius: 20px;        
+  }
+  *::-webkit-scrollbar-thumb {
+    background-color: #8E8E8E;    
+    border-radius: 20px;     
+  }
+
 * {
     margin: 0;
     padding: 0;
@@ -8,6 +25,11 @@
     align-items: center;
     align-content: center;
     font-family: 'Montserrat';
+    overflow: hidden;
+    overflow-y: auto;
+}
+
+html {
     overflow: hidden;
 }
 
@@ -63,6 +85,7 @@ header section {
     height: 25px;
     background-color: #fff;
     margin-left: 20px;
+    overflow: hidden;
 }
 
 .user-avatar {
@@ -75,18 +98,26 @@ header section {
     flex-direction: column;
     justify-content: center;
     width: 50%;
-    height: 85vh;
+    height: 90vh;
     margin: auto;
-    margin-top: 12vh;
+    margin-top: 9vh;
     border: 1px solid rgb(189, 189, 189);
     border-radius: 15px;
+    position: absolute;
+    overflow-y: auto;
+    top: 0%;
+    left: 25%;
+    width: 50%;
 }
 
 .photo-section {
     min-width: 50%;
     min-height: 70%;
     max-width: 90%;
-    max-height: 85%;
+    max-height: 75%;
+    justify-content: center;
+    display: flex;
+    flex-direction: column;
 }
 
 .img {
@@ -116,9 +147,25 @@ header section {
     margin-left: 12px;
 }
 
-.under-post {
+.comments {
     width: 85%;
-    margin-top: 10px;
+    margin-top: 5px;
+    margin-bottom: 15px;
+    padding-right: 5px;
+    max-height: 100px;
+}
+
+.under-post-buttons {
+    overflow: hidden;
+    width: 85%;
+    margin-top: 5px;
+    min-height: 24px;
+}
+
+.under-post-likes {
+    width: 85%;
+    overflow: hidden;
+    min-height: 26px;
 }
 
 .comment-text {
@@ -151,5 +198,5 @@ header section {
     width: 100%;
     object-fit: contain;
     border-radius: 5px;
-    height: 85%;
+    max-height: 85%;
 }
