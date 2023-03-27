@@ -90,6 +90,13 @@ def save_like(user, id_post):
     
     return
 
+def delete_post_from_db(user, id_post):
+    model_post = get_model_post(id_post)
+    if user.id != model_post.user.id:
+        return None
+    model_post.delete()
+    return
+
 def get_post_interaction(post):
     try:
         return {

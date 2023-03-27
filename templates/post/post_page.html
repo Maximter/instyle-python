@@ -136,17 +136,19 @@
       showCancelButton: true,
       cancelButtonText: 'Нет',
       confirmButtonColor: '#ff3535',
-      cancelButtonColor: 'rgb(128 226 72)',
+      cancelButtonColor: '#00cc00',
     }).then((result) => {
      
       if (result.isConfirmed) {
+        const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
         fetch(`${window.location.origin}/post/delete/${id_img}/`, {
-          method: "get",
+          method: "post",
           headers: {
             'Accept': 'application/json',
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrftoken,
           },
-        }).then(response => response.json())
+        }).then(response => response)
           .then(result => { 
             Swal.fire({
               position: 'top',

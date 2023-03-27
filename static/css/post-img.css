@@ -50,6 +50,14 @@ header {
     justify-content: center;
 }
 
+.swal2-icon.swal2-success {
+    overflow: hidden;
+}
+
+.swal2-icon.swal2-warning.swal2-icon-show {
+    overflow: hidden;
+}
+
 a {
     text-decoration: none;
     color: #000;

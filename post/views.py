@@ -1,10 +1,9 @@
 from django.http import HttpResponse
 from django.shortcuts import render
 
-from post.service import check_valid_post, get_model_post, get_post_interaction, get_user_post_interaction, save_like, save_post_to_db, upload_post
+from post.service import check_valid_post, delete_post_from_db, get_model_post, get_post_interaction, get_user_post_interaction, save_like, save_post_to_db, upload_post
 from user.service import get_user_by_token
 
-# Create your views here.
 def index(request):
     user = get_user_by_token(request.COOKIES.get('instyle_token'))
     return render(request, 'post/index.html', context={'user':user})
@@ -47,13 +46,6 @@ def like_post(request, id_post):
 
 
 def delete_post(request, id_post):
-    return
-
-#   @Get('delete/:id')
-#   async deletePost(@Req() req: Request, @Res() res: Response) {
-#     const user = await this.appService.getUser(req);
-#     await this.postService.deletePost(user, req.params.id);
-#     res.json('');
-#     res.end();
-#   }
-
+    user = get_user_by_token(request.COOKIES.get('instyle_token'))
+    delete_post_from_db(user, id_post)
+    return HttpResponse()
