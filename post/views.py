@@ -34,8 +34,9 @@ def post_page(request, id_post):
         return render(request, 'error/404.html')
     user = get_user_by_token(request.COOKIES.get('instyle_token'))
     model_post.interaction = get_post_interaction(model_post)
-    user.owner = user.id == model_post.user.id
-    user.post_interaction = get_user_post_interaction(user, model_post)
+    if user is not None:
+        user.owner = user.id == model_post.user.id
+        user.post_interaction = get_user_post_interaction(user, model_post)
     return render(request, 'post/post_page.html', context={'user':user, 'post':model_post})
 
 
