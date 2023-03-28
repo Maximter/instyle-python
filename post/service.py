@@ -5,6 +5,7 @@ from django.utils.crypto import get_random_string
 from sorl.thumbnail import get_thumbnail
 from django.core.files.move import file_move_safe
 from django.db.models import Case, Value, When
+from django.db.models import Q
 
 
 from post.models import Post, Post_interaction
@@ -103,7 +104,7 @@ def update_post_comment_db(post, comment):
 def get_post_interaction(post):
     try:
         return {
-            'info': Post_interaction.objects.filter(post=post.id,),
+            'info': Post_interaction.objects.filter(post=post.id, comment=Q(comment='')),
             'like_count': len(Post_interaction.objects.filter(post=post.id, like=True))
         }
     except Post_interaction.DoesNotExist:
@@ -121,3 +122,16 @@ def get_model_post(id_post):
     except Post.DoesNotExist:
         return None
     return model_post
+
+def send_comment_db(user, post, comment):
+    try:
+        interactions = Post_interaction.objects.filter(post=post.id, user=user.id)
+        print(post, user, interactions)
+        if len(interactions) == 0:
+            raise Post_interaction.DoesNotExist
+        interactions.update(comment=comment)
+    except Post_interaction.DoesNotExist:
+        Post_interaction.objects.create_comment(user= user, post=post, comment=comment)
+    
+    return
+

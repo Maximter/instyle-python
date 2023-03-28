@@ -2,7 +2,7 @@ import json
 from django.http import HttpResponse
 from django.shortcuts import render
 
-from post.service import delete_post_from_db, get_model_post, get_post_interaction, get_user_post_interaction, save_like, update_post_comment_db
+from post.service import delete_post_from_db, get_model_post, get_post_interaction, get_user_post_interaction, save_like, send_comment_db, update_post_comment_db
 from user.service import get_user_by_token
 
 
@@ -31,14 +31,30 @@ def delete_post(request, id_post):
 
 
 def update_post_comment (request, id_post):
-    body_unicode = request.body.decode('utf-8')
-    body_data = json.loads(body_unicode)
-    comment = body_data['comment']
+    comment = get_comment(request)
+    if len(comment) < 10 or len(comment) > 1500:
+        return
     model_post = get_model_post(id_post)
     user = get_user_by_token(request.COOKIES.get('instyle_token'))
 
     if model_post.user.id != user.id:
-        return None
+        return
 
     update_post_comment_db(model_post, comment)
     return HttpResponse() 
+
+
+def send_comment(request, id_post):
+    comment = get_comment(request)
+    if len(comment) < 2 or len(comment) > 1500:
+        return
+    model_post = get_model_post(id_post)
+    user = get_user_by_token(request.COOKIES.get('instyle_token'))
+    send_comment_db(user, model_post, comment)
+    return HttpResponse() 
+
+
+def get_comment(request):
+    body_unicode = request.body.decode('utf-8')
+    body_data = json.loads(body_unicode)
+    return body_data['comment']

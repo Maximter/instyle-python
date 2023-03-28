@@ -66,10 +66,18 @@
         
        <div class="comments">
           {%if post.comment%}<p class="comment-text"><a href="/user/{{user.username}}"><span style="font-weight: 500;">{{post.user.username}}:</span></a> {{post.comment}}</p>{%endif%}
+          {%for this in post.interaction.info%}
+          <p class="comment-text"><a href="/user/{{user.username}}"><span style="font-weight: 500;">{{this.user.username}}:</span></a> {{this.comment}}</p>
+          {%endfor%}
         </div>
-    </section>
+      <div class="input-box">
+        <input type="text" class="input-text" id="input_comment" placeholder="Оставьте комментарий...">
+        <img class="imgSend" onclick="send_comment('{{post.id_post}}')" src="{% static 'img/system/send.svg' %}">
+      </div>
+    </div> 
+  </section>
 
-    </div>  
+    
 
     <script src="{% static 'js/sweetalert2.all.min.js' %}"></script>
     <script src="{% static "js/particles.js" %}"></script>
@@ -120,7 +128,15 @@
      if (result.isConfirmed) {
       
        comment = document.getElementById('new-comment').value
-       console.log(comment);
+       if (comment.length < 10 || comment.length > 1500)  {
+          Swal.fire({
+             position: 'top',
+             icon: 'error',
+             title: 'Длина описания слишком короткая или слишком длинная',
+             showConfirmButton: true,
+           })
+           return
+        }
        const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
        fetch(`${window.location.origin}/post/edit/${id_img}/`, {
          method: "post",
@@ -167,6 +183,40 @@
                 timer: 2000
               })
           });
+      }
+    
+      function send_comment(id_img) {
+        const input_comment = document.getElementById('input_comment').value
+        if (input_comment.length < 2 || input_comment.length > 1500) {
+          Swal.fire({
+             position: 'top',
+             icon: 'error',
+             title: 'Длина комментария слишком короткая или слишком длинная',
+             showConfirmButton: true,
+           })
+           return
+        }
+        const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        fetch(`${window.location.origin}/post/comment/${id_img}/`, {
+         method: "post",
+         body: JSON.stringify({'comment': input_comment}),
+         headers: {
+           'Accept': 'application/json',
+           'Content-Type': 'application/json',
+           'X-CSRFToken': csrftoken,
+         },
+       }).then(response => response)
+         .then(result => { 
+           Swal.fire({
+             position: 'top',
+             icon: 'success',
+             title: 'Комментарий оставлен',
+             showConfirmButton: false,
+             timer: 1000
+           }).then(() => {
+             window.location.href = `${window.location.origin}/post/${id_img}/`
+           })
+         })
       }
     </script>
 
@@ -222,7 +272,7 @@
         html:`   <div class="more-menu">
       <p style="color: red;" onclick="deletePost('{{post.id_post}}', '{{user.username}}')">Удалить</p>
       <p onclick="copy()">Скопировать ссылку на пост</p>
-      <p onclick="edit_comment('{{post.comment}}', '{{post.id_post}}')">Редактировать описание</p>
+      <p onclick="edit_comment('{{post.comment|stringformat:"i"}}', '{{post.id_post}}')">Редактировать описание</p>
       <p>Скрывать число отметок "Нравится"</p>
       <p>Выключить комментарии</p>
       <p onclick="close_menu()" style="border-bottom: none;">Отмена</p>

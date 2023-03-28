@@ -71,6 +71,37 @@ header {
     justify-content: center;
 }
 
+input {
+    outline: none;
+}
+
+.input-box {
+    display: flex;
+    background: #fafbfc;
+    align-items: center;
+    justify-content: space-evenly;
+    height: 10%;
+    width: 100%;
+    border-top: 1px solid #dce1e6;
+}
+
+.imgSend {
+    width: 24px;
+    cursor: pointer;
+    background: none;
+    overflow: hidden;
+}
+
+.input-text {
+    height: 70%;
+    width: 85%;
+    color: #000;
+    background: #fff;
+    padding-left: 10px;
+    border: 1px solid #dce1e6;
+    border-radius: 5px;
+}
+
 .more-menu p {
     width: 100%;
     cursor: pointer;
@@ -78,6 +109,14 @@ header {
     padding: 20px;
     border-bottom: 1px solid rgb(219, 219, 219);
     border-bottom: 1px solid rgb(219, 219, 219);
+}
+
+.more-menu p:hover {
+    background-color: #f7f7f7;
+}
+
+.write-comment {
+    width: 100%;
 }
 
 .more {
@@ -212,10 +251,10 @@ header section {
 
 .post-info-textbox {
     padding: 10px;
-    max-width: 400px;
+    max-width: 440px;
     max-height: 60vh;
-    min-width: 300px;
-    min-height: 100px;
+    min-width: 440px;
+    min-height: 180px;
 }
 
 .show-comments {
