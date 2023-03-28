@@ -46,7 +46,6 @@ class Post_interaction(models.Model,):
     )
     like = models.BooleanField(default=False)
     comment = models.CharField(default='', max_length=1500)
-    date_comment = models.DateTimeField(default=timezone.now)
     objects = Post_interactionManage()
     
     class Meta:

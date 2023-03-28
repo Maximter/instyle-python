@@ -97,6 +97,9 @@ def delete_post_from_db(user, id_post):
     model_post.delete()
     return
 
+def update_post_comment_db(post, comment):
+    return Post.objects.filter(id=post.id).update(comment=comment)
+
 def get_post_interaction(post):
     try:
         return {

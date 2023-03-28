@@ -30,15 +30,21 @@
     
     <section class="main-section" id="one-section">
       <div class="photo-section">
-        <a href="/user/{{post.user.username}}" class="owner-block">
-
-          {%if post.user.avatar%}
-          <img src="{% static 'img/small/avatar/{{post.user.id}}.png' %}" alt="{{post.user.name_lastname}}" title="{{post.user.name_lastname}}" class="owner-avatar">
-          {%else%}
-          <img src="{% static 'img/small/avatar/standard.png' %}" alt="{{post.user.name_lastname}}" title="{{post.user.name_lastname}}" class="owner-avatar">
-          {%endif%}
-          <p class="owner-username">{{post.user.username}}</p>        
-        </a>
+        <div class="owner-block">
+          <a href="/user/{{post.user.username}}" style="display: flex;">
+            {%if post.user.avatar%}
+            <img src="{% static 'img/small/avatar/{{post.user.id}}.png' %}" alt="{{post.user.name_lastname}}" title="{{post.user.name_lastname}}" class="owner-avatar">
+            {%else%}
+            <img src="{% static 'img/small/avatar/standard.png' %}" alt="{{post.user.name_lastname}}" title="{{post.user.name_lastname}}" class="owner-avatar">
+            {%endif%}
+            <p class="owner-username">{{post.user.username}}</p>   
+          </a>
+          <div style="display: flex;">
+            <p class="date-of-post">{{post.date_post}}</p>
+            <img src="{% static 'img/system/more.svg' %}" title="Ещё" class="more" onclick="more()">
+          </div>
+         
+        </div>
 
         {%if post.mp4%}
           <video class="post-pic" controls="controls">
@@ -52,21 +58,14 @@
       <div class="under-post-buttons">
         {%if user.post_interaction.like%}
             <img src="{% static 'img/system/liked.svg' %}" title="Нравится" class="like" onclick="like(this, '{{post.id_post}}')">
-          {%else%}
+        {%else%}
             <img src="{% static 'img/system/notification-empty.svg' %}" title="Нравится" class="like" onclick="like(this, '{{post.id_post}}')">
-          {%endif%}
-          <img src="{% static 'img/system/copy.svg' %}" title="Скопировать ссылку" class="copy" id="copy">
-          {%if user.owner%}
-           <img src="{% static 'img/system/delete.svg' %}" title="Удалить пост" class="delete" onclick="deletePost('{{post.id_post}}', '{{user.username}}')">
-          {%endif%}
+        {%endif%}
+            <p class="comment-text" style="margin: 0 0 0 10px;"><span style="font-weight: 500; " id="likes_{{post.id_post}}" likes="{{post.interaction.like_count}}" >Отметок нравится: {{post.interaction.like_count}}</span></p>
         </div>
-        <div class="under-post-likes">
-          <p class="comment-text"><span style="font-weight: 500;" id="likes_{{post.id_post}}" likes="{{post.interaction.like_count}}" >Отметок нравится: {{post.interaction.like_count}}</span></p>
-        </div>
-           
-
+        
        <div class="comments">
-          {%if post.comment%}<p class="comment-text"><a href="/user/{{this.user.username}}"><span style="font-weight: 500;">{{post.user.username}}:</span></a> {{post.comment}}</p>{%endif%}
+          {%if post.comment%}<p class="comment-text"><a href="/user/{{user.username}}"><span style="font-weight: 500;">{{post.user.username}}:</span></a> {{post.comment}}</p>{%endif%}
         </div>
     </section>
 
@@ -100,9 +99,55 @@
         count.innerHTML = `Отметок нравится: ${count.attributes.likes.value}`;
       }
 
-      const copy = document.getElementById('copy')
+      function close_menu() {
+        Swal.fire({
+              position: 'top',
+              showConfirmButton: false,
+              timer: 1
+            })
+          }
+    
+      function edit_comment(comment, id_img) {
+        Swal.fire({
+              position: 'top',
+              title: 'Редактирование описания',
+              html: `<textarea type="text" class="post-info-textbox" placeholder="Напишите описание к фотографии..." id="new-comment" name="new-comment">{{post.comment}}</textarea> <br>`,
+              showConfirmButton: true,
+              confirmButtonText: 'Сохранить',
+              confirmButtonColor: 'rgb(0, 204, 0)'
+            }).then((result) => {
+    
+     if (result.isConfirmed) {
+      
+       comment = document.getElementById('new-comment').value
+       console.log(comment);
+       const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+       fetch(`${window.location.origin}/post/edit/${id_img}/`, {
+         method: "post",
+         body: JSON.stringify({'comment': comment}),
+         headers: {
+           'Accept': 'application/json',
+           'Content-Type': 'application/json',
+           'X-CSRFToken': csrftoken,
+         },
+       }).then(response => response)
+         .then(result => { 
+           Swal.fire({
+             position: 'top',
+             icon: 'success',
+             title: 'Описание было изменено',
+             showConfirmButton: false,
+             timer: 1000
+           }).then(() => {
+             window.location.href = `${window.location.origin}/post/${id_img}/`
+           })
+         })
+     }
+     
+     });
+      }
 
-      copy.onclick = () => {
+      function copy (){
         navigator.clipboard.writeText(window.location.href)
           .then(() => {
              Swal.fire({
@@ -124,6 +169,8 @@
           });
       }
     </script>
+
+
 
     {%if user.owner%}
     <script>
@@ -165,6 +212,44 @@
       });
     }
     </script>
+
+    <script>
+    function more() {
+      Swal.fire({
+        position: 'top',
+        showCancelButton: false,
+        showConfirmButton: false,
+        html:`   <div class="more-menu">
+      <p style="color: red;" onclick="deletePost('{{post.id_post}}', '{{user.username}}')">Удалить</p>
+      <p onclick="copy()">Скопировать ссылку на пост</p>
+      <p onclick="edit_comment('{{post.comment}}', '{{post.id_post}}')">Редактировать описание</p>
+      <p>Скрывать число отметок "Нравится"</p>
+      <p>Выключить комментарии</p>
+      <p onclick="close_menu()" style="border-bottom: none;">Отмена</p>
+    </div>`, 
+        
+      })
+      }
+    </script>
+    {%else%}
+    <script>
+      function more() {
+        Swal.fire({
+          position: 'top',
+          showCancelButton: false,
+          showConfirmButton: false,
+          html:`   <div class="more-menu">
+        <p onclick="copy()">Скопировать ссылку на пост</p>
+        <p onclick="close_menu()" style="border-bottom: none;">Отмена</p>
+      </div>`, 
+          
+        })
+        }
+      </script>
     {%endif%}
+ 
+
+
+
   </body>
 </html>
