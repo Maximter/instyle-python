@@ -66,12 +66,24 @@
         
        <div class="comments">
           {%if post.comment%}<p class="comment-text"><a href="/user/{{user.username}}"><span style="font-weight: 500;">{{post.user.username}}:</span></a> {{post.comment}}</p>{%endif%}
+          <div class="under-comment">
           {%for this in post.interaction.info%}
-          <p class="comment-text"><a href="/user/{{user.username}}"><span style="font-weight: 500;">{{this.user.username}}:</span></a> {{this.comment}}</p>
+          <div style="display: flex; margin-bottom: 9px;">
+          <p class="comment-text"><a href="/user/{{this.user.username}}"><span style="font-weight: 500;">{{this.user.username}}:</span></a> {{this.comment}}</p>
+          {%if this.user.id == user.id%}
+          <img src="{% static 'img/system/more.svg' %}" title="Ещё" class="small-more" id_post="{{this.id}}" comment="{{this.comment}}"  onclick="smallMore(this)">
+          {%else%}
+            {%if user.id == post.user.id%}
+            <img src="{% static 'img/system/more.svg' %}" title="Ещё" class="small-more" id_post="{{this.id}}" comment="{{this.comment}}" onclick="ownerSmallMore(this)">
+            {%endif%}
+          {%endif%}
+        </div>
           {%endfor%}
+
+        </div>
         </div>
       <div class="input-box">
-        <input type="text" class="input-text" id="input_comment" placeholder="Оставьте комментарий...">
+        <input type="text" class="input-text" id="input_comment" placeholder="Оставить комментарий...">
         <img class="imgSend" onclick="send_comment('{{post.id_post}}')" src="{% static 'img/system/send.svg' %}">
       </div>
     </div> 
@@ -84,6 +96,8 @@
     <script src="{% static "js/particles-start.js" %}"></script>
     {% csrf_token %}
     <script>
+      edit_comment_val = ''
+      id_post_val = ''
       function like (el, id_img) {
         const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
         fetch(`${window.location.origin}/post/like/${id_img}/`, {
@@ -119,7 +133,7 @@
         Swal.fire({
               position: 'top',
               title: 'Редактирование описания',
-              html: `<textarea type="text" class="post-info-textbox" placeholder="Напишите описание к фотографии..." id="new-comment" name="new-comment">{{post.comment}}</textarea> <br>`,
+              html: `<textarea type="text" class="post-info-textbox" placeholder="Напишите описание к записи..." id="new-comment" name="new-comment">{{post.comment}}</textarea> <br>`,
               showConfirmButton: true,
               confirmButtonText: 'Сохранить',
               confirmButtonColor: 'rgb(0, 204, 0)'
@@ -128,7 +142,7 @@
      if (result.isConfirmed) {
       
        comment = document.getElementById('new-comment').value
-       if (comment.length < 10 || comment.length > 1500)  {
+       if (comment.length < 2 || comment.length > 1500)  {
           Swal.fire({
              position: 'top',
              icon: 'error',
@@ -163,6 +177,52 @@
      });
       }
 
+      function edit_post_comment() {
+        Swal.fire({
+              position: 'top',
+              title: 'Редактирование комментария',
+              html: `<textarea type="text" class="post-info-textbox" placeholder="Напишите комментарий..." id="new-under-comment" name="new-under-comment">${edit_comment_val}</textarea> <br>`,
+              showConfirmButton: true,
+              confirmButtonText: 'Сохранить',
+              confirmButtonColor: 'rgb(0, 204, 0)'
+            }).then((result) => {
+
+     if (result.isConfirmed) {
+       comment = document.getElementById('new-under-comment').value
+       if (comment.length < 2 || comment.length > 1500)  {
+          Swal.fire({
+             position: 'top',
+             icon: 'error',
+             title: 'Длина комментария слишком короткая или слишком длинная',
+             showConfirmButton: true,
+           })
+           return
+        }
+       const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+       fetch(`${window.location.origin}/post/edit-comment/${id_post_val}/`, {
+         method: "post",
+         body: JSON.stringify({'comment': comment}),
+         headers: {
+           'Accept': 'application/json',
+           'Content-Type': 'application/json',
+           'X-CSRFToken': csrftoken,
+         },}).then(response => response)
+         .then(result => { 
+           Swal.fire({
+             position: 'top',
+             icon: 'success',
+             title: ' Комментарий был изменен',
+             showConfirmButton: false,
+             timer: 1000
+           }).then(() => {
+             window.location.href = `${window.location.origin}/post/{{post.id_post}}/`
+           })
+         })
+     }
+     
+     });
+    }
+      
       function copy (){
         navigator.clipboard.writeText(window.location.href)
           .then(() => {
@@ -218,8 +278,73 @@
            })
          })
       }
-    </script>
+    
+      function delete_post_comment() {
+        Swal.fire({
+      position: 'top',
+      icon: 'warning',
+      title: 'Вы действительно хотите удалить этот комментарий?',
+      confirmButtonText: 'Да',
+      showCancelButton: true,
+      cancelButtonText: 'Нет',
+      confirmButtonColor: '#ff3535',
+      cancelButtonColor: '#00cc00',
+    }).then((result) => {
+     
+      if (result.isConfirmed) {
+        const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        fetch(`${window.location.origin}/post/delete-comment/${id_post_val}/`, {
+          method: "post",
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrftoken,
+          },
+        }).then(response => response)
+          .then(result => { 
+            Swal.fire({
+              position: 'top',
+              icon: 'success',
+              title: 'Комментарий был удален',
+              showConfirmButton: false,
+              timer: 1000
+            }).then(() => {
+              window.location.href = `${window.location.origin}/post/{{post.id_post}}`
+            })
+          })
+      }
+      
+      });
+      }
 
+      function smallMore(el) {
+        edit_comment_val = el.getAttribute('comment');
+        id_post_val = el.getAttribute('id_post');
+        Swal.fire({
+        position: 'top',
+        showCancelButton: false,
+        showConfirmButton: false,
+        html:`   <div class="more-menu">
+          <p style="color: red;" onclick="delete_post_comment()">Удалить комментарий</p>
+          <p onclick="edit_post_comment()">Редактировать комментарий</p>
+          <p onclick="close_menu()" style="border-bottom: none;">Отмена</p>
+        </div>`,   
+      })
+      }
+
+      function ownerSmallMore(el) {
+        id_post_val = el.getAttribute('id_post');
+        Swal.fire({
+        position: 'top',
+        showCancelButton: false,
+        showConfirmButton: false,
+        html:`   <div class="more-menu">
+          <p style="color: red;" onclick="delete_post_comment()">Удалить комментарий</p>
+          <p onclick="close_menu()" style="border-bottom: none;">Отмена</p>
+        </div>`,   
+      })
+      }
+    </script>
 
 
     {%if user.owner%}

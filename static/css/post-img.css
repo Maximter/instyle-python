@@ -102,6 +102,12 @@ input {
     border-radius: 5px;
 }
 
+.small-more {
+    width: 10px;
+    cursor: pointer;
+    margin: 3px 0 0 3px;
+}
+
 .more-menu p {
     width: 100%;
     cursor: pointer;
@@ -230,6 +236,15 @@ header section {
     max-height: 100px;
 }
 
+.under-comment {
+    display: flex;
+    flex-wrap: wrap;
+    margin-top: 10px;
+    flex-direction: column;
+    align-content: flex-start;
+    align-items: flex-start;
+}
+
 .under-post-buttons {
     display: flex;
     overflow: hidden;
@@ -245,7 +260,6 @@ header section {
 }
 
 .comment-text {
-    margin-top: 10px;
     font-size: 14px;
 }
 

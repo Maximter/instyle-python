@@ -88,6 +88,7 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'OPTIONS': {
+            'charset': 'utf8mb4',
             'read_default_file': os.path.join(BASE_DIR, 'my.cnf'), 
         },
     } 

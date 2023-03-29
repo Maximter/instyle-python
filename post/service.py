@@ -110,6 +110,16 @@ def get_post_interaction(post):
     except Post_interaction.DoesNotExist:
         return None
 
+def get_post_interaction_by_id(id_interaction):
+    try:
+        return Post_interaction.objects.get(id=id_interaction)
+    except Post_interaction.DoesNotExist:
+        return None
+
+def edit_comment_db(interaction, comment):
+    print('F')
+    return Post_interaction.objects.filter(id=interaction.id).update(comment=str(comment))
+
 def get_user_post_interaction(user, post):
     try:
         return Post_interaction.objects.get(user=user.id, post=post.id)
@@ -126,12 +136,23 @@ def get_model_post(id_post):
 def send_comment_db(user, post, comment):
     try:
         interactions = Post_interaction.objects.filter(post=post.id, user=user.id)
-        print(post, user, interactions)
         if len(interactions) == 0:
             raise Post_interaction.DoesNotExist
         interactions.update(comment=comment)
     except Post_interaction.DoesNotExist:
         Post_interaction.objects.create_comment(user= user, post=post, comment=comment)
     
+    return
+
+def delete_comment_from_db(user, id_interaction):
+    try:
+        model_interaction = Post_interaction.objects.filter(id=id_interaction)
+    except Post.DoesNotExist:
+        return None
+
+    if user.id != model_interaction[0].user.id and model_interaction[0].post.user.id != user.id:
+        return None
+    
+    model_interaction.update(comment='')
     return
 
