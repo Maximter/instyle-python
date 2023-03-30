@@ -1,10 +1,11 @@
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponseRedirect
 from django.shortcuts import render
-from .service import follow_db, get_followers, get_followings, get_posts, get_posts_for_other, get_user_by_token, get_owner, is_follower
+from .service import delete_relation, follow_db, get_followers, get_followings, get_posts, get_posts_for_other, get_user_by_token, get_owner, is_follower
 
 def index(request):
     response = HttpResponseRedirect('/')
     return response
+
 
 def user_page(request, username):
     user = get_user_by_token(request.COOKIES.get('instyle_token'))
@@ -31,6 +32,7 @@ def user_page(request, username):
     }
     return render(request, 'user/index.html', context)
 
+
 def follow(request, username):
     user = get_user_by_token(request.COOKIES.get('instyle_token'))
     owner = get_owner(username)
@@ -40,3 +42,9 @@ def follow(request, username):
     follow_db(user, owner)
     return HttpResponseRedirect(f'/user/{owner.username}')
 
+def unfollow(request, username):
+    owner = get_user_by_token(request.COOKIES.get('instyle_token'))
+    user = get_owner(username)
+    
+    follow_db(user, owner)
+    return HttpResponseRedirect(f'/user/{owner.username}')

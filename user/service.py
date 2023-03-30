@@ -20,11 +20,10 @@ def get_owner(username):
 
 def get_posts_for_other(user, owner):
     try:
-        # Если подписан, то другая функция TODO
-        # if user.follower:
-            # posts = Post.objects.filter(Q(user=owner) & Q(visibility='all') | Q(visibility='follower')).order_by('-id')
-        # else:
-        posts = Post.objects.filter(Q(user=owner) & Q(visibility='all')).order_by('-id')
+        if user.is_follower:
+            posts = Post.objects.filter(Q(user=owner) & Q(visibility='all') | Q(visibility='follower')).order_by('-id')
+        else:
+            posts = Post.objects.filter(Q(user=owner) & Q(visibility='all')).order_by('-id')
     except User.DoesNotExist:
         return None
     return posts
@@ -48,11 +47,16 @@ def is_follower(follower, following):
         return False
 
 
+def delete_relation(follower, following):
+    return
+
+
 def get_followers(user):
     try:
         return Follow.objects.filter(following=user)
     except Follow.DoesNotExist:
         return []
+
 
 def get_followings(user):
     try:
