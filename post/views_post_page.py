@@ -2,7 +2,7 @@ import json
 from django.http import HttpResponse
 from django.shortcuts import render
 
-from post.service import delete_comment_from_db, delete_post_from_db, edit_comment_db, get_model_post, get_post_interaction, get_post_interaction_by_id, get_user_post_interaction, save_like, send_comment_db, update_post_comment_db
+from post.service import delete_comment_from_db, delete_post_from_db, edit_comment_db, get_model_post, get_post_interaction, get_post_interaction_by_id, get_user_post_interaction, save_like, send_comment_db, update_hide_comment, update_hide_like, update_post_comment_db
 from user.service import get_user_by_token
 
 
@@ -67,6 +67,23 @@ def edit_comment(request, id_interaction):
 def delete_comment(request, id_interaction):
     user = get_user_by_token(request.COOKIES.get('instyle_token'))
     delete_comment_from_db(user, id_interaction)
+    return HttpResponse()
+
+
+def hide_like(request, id_post):
+    user = get_user_by_token(request.COOKIES.get('instyle_token'))
+    model_post = get_model_post(id_post)
+    if model_post.user != user:
+        return
+    update_hide_like(model_post)
+    return HttpResponse()
+
+def hide_comment(request, id_post):
+    user = get_user_by_token(request.COOKIES.get('instyle_token'))
+    model_post = get_model_post(id_post)
+    if model_post.user != user:
+        return
+    update_hide_comment(model_post)
     return HttpResponse()
 
 

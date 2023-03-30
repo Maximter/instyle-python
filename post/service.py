@@ -117,7 +117,6 @@ def get_post_interaction_by_id(id_interaction):
         return None
 
 def edit_comment_db(interaction, comment):
-    print('F')
     return Post_interaction.objects.filter(id=interaction.id).update(comment=str(comment))
 
 def get_user_post_interaction(user, post):
@@ -156,3 +155,28 @@ def delete_comment_from_db(user, id_interaction):
     model_interaction.update(comment='')
     return
 
+def update_hide_like(post):
+    try:
+        model_post = Post.objects.filter(id=post.id,)
+        if len(model_post) == 0:
+            raise Post_interaction.DoesNotExist
+        model_post.update(hide_like=Case(
+            When(hide_like=True, then=Value(False)),
+            When(hide_like=False, then=Value(True)),
+        ))
+    except Post_interaction.DoesNotExist:
+        return None
+    return
+
+def update_hide_comment(post):
+    try:
+        model_post = Post.objects.filter(id=post.id,)
+        if len(model_post) == 0:
+            raise Post_interaction.DoesNotExist
+        model_post.update(hide_comment=Case(
+            When(hide_comment=True, then=Value(False)),
+            When(hide_comment=False, then=Value(True)),
+        ))
+    except Post_interaction.DoesNotExist:
+        return None
+    return

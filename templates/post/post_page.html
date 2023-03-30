@@ -61,11 +61,17 @@
         {%else%}
             <img src="{% static 'img/system/notification-empty.svg' %}" title="Нравится" class="like" onclick="like(this, '{{post.id_post}}')">
         {%endif%}
+
+        {%if post.hide_like == False%}
             <p class="comment-text" style="margin: 0 0 0 10px;"><span style="font-weight: 500; " id="likes_{{post.id_post}}" likes="{{post.interaction.like_count}}" >Отметок нравится: {{post.interaction.like_count}}</span></p>
-        </div>
+        {%else%}
+        <p class="comment-text" style="margin: 0 0 0 10px;"><span style="font-weight: 500; " id="likes_{{post.id_post}}" >Нравится некоторым людям</span></p>
+            {%endif%}
+          </div>
         
        <div class="comments">
           {%if post.comment%}<p class="comment-text"><a href="/user/{{user.username}}"><span style="font-weight: 500;">{{post.user.username}}:</span></a> {{post.comment}}</p>{%endif%}
+          {%if post.hide_comment == False%}
           <div class="under-comment">
           {%for this in post.interaction.info%}
           <div style="display: flex; margin-bottom: 9px;">
@@ -81,11 +87,14 @@
           {%endfor%}
 
         </div>
+        {%endif%}
         </div>
+      {%if post.hide_comment == False%}
       <div class="input-box">
         <input type="text" class="input-text" id="input_comment" placeholder="Оставить комментарий...">
         <img class="imgSend" onclick="send_comment('{{post.id_post}}')" src="{% static 'img/system/send.svg' %}">
       </div>
+      {%endif%}
     </div> 
   </section>
 
@@ -109,16 +118,21 @@
           },
         });
         const count = document.getElementById(`likes_${id_img}`);
+        const hide_like = '{{post.hide_like}}'
 
         if (el.src.indexOf('notification') > -1) {
           el.src = "/static/img/system/liked.svg";
-          count.attributes.likes.value = ++count.attributes.likes.value;
+          if (!hide_like)
+            count.attributes.likes.value = ++count.attributes.likes.value;
         }
         else {
-          count.attributes.likes.value = --count.attributes.likes.value;
           el.src = "/static/img/system/notification-empty.svg";
+          if (!hide_like)
+            count.attributes.likes.value = --count.attributes.likes.value;
+          
         }
-        count.innerHTML = `Отметок нравится: ${count.attributes.likes.value}`;
+        if (!hide_like)
+          count.innerHTML = `Отметок нравится: ${count.attributes.likes.value}`;
       }
 
       function close_menu() {
@@ -386,10 +400,68 @@
       
       });
     }
+    
+    function hide_like(id_post) {
+      const hide_like = '{{post.hide_like}}'
+      let word_like = 'были скрыты'
+      if (hide_like == 'True') word_like = 'будут показаны'
+      const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        fetch(`${window.location.origin}/post/hide-like/${id_post}/`, {
+         method: "post",
+         headers: {
+           'Accept': 'application/json',
+           'Content-Type': 'application/json',
+           'X-CSRFToken': csrftoken,
+         },
+       }).then(response => response)
+         .then(result => { 
+           Swal.fire({
+             position: 'top',
+             icon: 'success',
+             title: `Отметки Нравится ${word_like}`,
+             showConfirmButton: false,
+             timer: 1000
+           }).then(() => {
+             window.location.href = `${window.location.origin}/post/${id_post}/`
+           })
+         })
+    }
+    
+    function hide_comment(id_post) {
+      const hide_comment = '{{post.hide_comment}}'
+      let word_comment = 'были скрыты'
+      if (hide_comment == 'True') word_comment = 'будут показаны'
+      const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        fetch(`${window.location.origin}/post/hide-comment/${id_post}/`, {
+         method: "post",
+         headers: {
+           'Accept': 'application/json',
+           'Content-Type': 'application/json',
+           'X-CSRFToken': csrftoken,
+         },
+       }).then(response => response)
+         .then(result => { 
+           Swal.fire({
+             position: 'top',
+             icon: 'success',
+             title: `Комментарии ${word_comment}`,
+             showConfirmButton: false,
+             timer: 1000
+           }).then(() => {
+             window.location.href = `${window.location.origin}/post/${id_post}/`
+           })
+         })
+    }
     </script>
 
     <script>
     function more() {
+      const hide_like = '{{post.hide_like}}'
+      const hide_comment = '{{post.hide_comment}}'
+      let word_like = 'Скрывать'
+      let word_comment = 'Скрывать'
+      if (hide_like == 'True') word_like = 'Показывать'
+      if (hide_comment == 'True') word_comment = 'Показывать'
       Swal.fire({
         position: 'top',
         showCancelButton: false,
@@ -398,8 +470,8 @@
       <p style="color: red;" onclick="deletePost('{{post.id_post}}', '{{user.username}}')">Удалить</p>
       <p onclick="copy()">Скопировать ссылку на пост</p>
       <p onclick="edit_comment('{{post.comment|stringformat:"i"}}', '{{post.id_post}}')">Редактировать описание</p>
-      <p>Скрывать число отметок "Нравится"</p>
-      <p>Выключить комментарии</p>
+      <p onclick="hide_like('{{post.id_post}}')">${word_like} число отметок "Нравится"</p>
+      <p onclick="hide_comment('{{post.id_post}}')">${word_comment} комментарии</p>
       <p onclick="close_menu()" style="border-bottom: none;">Отмена</p>
     </div>`, 
         

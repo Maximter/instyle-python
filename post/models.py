@@ -19,6 +19,8 @@ class Post(models.Model,):
         on_delete=models.CASCADE,
     )
     date_post = models.DateTimeField(default=timezone.now)
+    hide_like = models.BooleanField(default=False)
+    hide_comment = models.BooleanField(default=False)
     comment = models.CharField(max_length=1500)
     objects = PostManager()
     
