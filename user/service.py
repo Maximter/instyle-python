@@ -2,6 +2,8 @@ from post.models import Post
 from signup.models import Token, User
 from django.db.models import Q
 
+from user.models import Follow
+
 def get_user_by_token(token):
     try:
         token_model = Token.objects.get(token=token)
@@ -27,9 +29,41 @@ def get_posts_for_other(user, owner):
         return None
     return posts
 
+def follow_db(follower, following):
+    try:
+        realtion = Follow.objects.filter(follower=follower, following=following)
+        if len(realtion) == 0:
+            raise Follow.DoesNotExist
+        realtion.delete()
+    except Follow.DoesNotExist:
+        Follow.objects.create_post(follower=follower, following=following,)
+    return realtion
+
+
+def is_follower(follower, following):
+    try:
+        Follow.objects.get(follower=follower, following=following)
+        return True
+    except Follow.DoesNotExist:
+        return False
+
+
+def get_followers(user):
+    try:
+        return Follow.objects.filter(following=user)
+    except Follow.DoesNotExist:
+        return []
+
+def get_followings(user):
+    try:
+        return Follow.objects.filter(follower=user)
+    except Follow.DoesNotExist:
+        return []
+
+
 def get_posts(user):
     try:
         posts = Post.objects.filter(user=user).order_by('-id')
-    except User.DoesNotExist:
+    except Post.DoesNotExist:
         return None
     return posts

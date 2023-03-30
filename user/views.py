@@ -1,6 +1,6 @@
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
-from .service import get_posts, get_posts_for_other, get_user_by_token, get_owner
+from .service import follow_db, get_followers, get_followings, get_posts, get_posts_for_other, get_user_by_token, get_owner, is_follower
 
 def index(request):
     response = HttpResponseRedirect('/')
@@ -11,28 +11,32 @@ def user_page(request, username):
     owner = get_owner(username)
     if owner is None:
         return render(request, 'error/404.html')
-
+    
     user.owner = user.id == owner.id
-    # else:
-        # const follow = await this.userService.isFollow(user, owner);
-        #   if (follow) user['follow'] = true;
-
-    # const follows = await this.userService.getfollows(owner);
     if user.owner:
         posts = get_posts(owner)
     else:
+        user.is_follower = is_follower(user, owner)
         posts = get_posts_for_other(user, owner)
-    if posts is not None:
-        owner.countPost = len(posts)
-    # owner['followers'] = follows['follower'];
-    # owner['followings'] = follows['following'];
-    # owner['countFollowers'] = follows['follower'].length;
-    # owner['countFollowings'] = follows['following'].length;
-    # if (owner['online'] == '0') owner['onlineBool'] = true;   
-
+    owner.followers = get_followers(owner)
+    owner.followings = get_followings(owner)
+    owner.count_post = len(posts)
+    owner.count_followers = len(owner.followers)
+    owner.count_followings = len(owner.followings)
+    
     context = {
         'user': user,
         'owner': owner,
         'posts': posts,
     }
     return render(request, 'user/index.html', context)
+
+def follow(request, username):
+    user = get_user_by_token(request.COOKIES.get('instyle_token'))
+    owner = get_owner(username)
+
+    if owner is None or user == owner:
+        return
+    follow_db(user, owner)
+    return HttpResponseRedirect(f'/user/{owner.username}')
+

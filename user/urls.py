@@ -5,5 +5,6 @@ from django.conf import settings
 
 urlpatterns = [
     path('', views.index),
+    path('follow/<str:username>/', views.follow),
     path('<str:username>/', views.user_page),
 ]
