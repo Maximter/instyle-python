@@ -2,7 +2,7 @@ import json
 from django.http import HttpResponse
 from django.shortcuts import render
 
-from post.service import delete_comment_from_db, delete_post_from_db, edit_comment_db, get_model_post, get_post_interaction, get_post_interaction_by_id, get_user_post_interaction, save_like, send_comment_db, update_hide_comment, update_hide_like, update_post_comment_db
+from post.service import delete_comment_from_db, delete_post_from_db, edit_comment_db, edit_visibility_db, get_model_post, get_post_interaction, get_post_interaction_by_id, get_user_post_interaction, save_like, send_comment_db, update_hide_comment, update_hide_like, update_post_comment_db
 from user.service import get_user_by_token
 
 
@@ -12,9 +12,16 @@ def post_page(request, id_post):
         return render(request, 'error/404.html')
     user = get_user_by_token(request.COOKIES.get('instyle_token'))
     model_post.interaction = get_post_interaction(model_post)
+    print(user)
+    print(request.COOKIES.get('instyle_token'))
     if user is not None:
         user.owner = user.id == model_post.user.id
         user.post_interaction = get_user_post_interaction(user, model_post)
+        if not user.owner:
+            if model_post.visibility == 'nobody':
+                return render(request, 'error/404.html')
+            # elif model_post.visibility == 'follower':
+                #TODO проверка на подписку на пользователя        
     return render(request, 'post/post_page.html', context={'user':user, 'post':model_post})
 
 
@@ -78,6 +85,7 @@ def hide_like(request, id_post):
     update_hide_like(model_post)
     return HttpResponse()
 
+
 def hide_comment(request, id_post):
     user = get_user_by_token(request.COOKIES.get('instyle_token'))
     model_post = get_model_post(id_post)
@@ -85,6 +93,18 @@ def hide_comment(request, id_post):
         return
     update_hide_comment(model_post)
     return HttpResponse()
+
+
+def edit_visibility(request, id_post):
+    body_unicode = request.body.decode('utf-8')
+    body_data = json.loads(body_unicode)
+    visibility =  body_data['visibility']
+    user = get_user_by_token(request.COOKIES.get('instyle_token'))
+    model_post = get_model_post(id_post)
+    if model_post.user != user:
+        return None
+    edit_visibility_db(model_post, visibility)
+    return HttpResponse() 
 
 
 def get_comment(request):

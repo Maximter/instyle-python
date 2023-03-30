@@ -1,17 +1,14 @@
-from datetime import date
-import datetime
 from django.db import models
 from django.utils import timezone
 
 from signup.models import User
 
-# Create your models here.
+
 class PostManager(models.Manager):
     def create_post(self, id_post, user, comment):
         post = self.create(id_post=id_post, user=user, comment=comment)
         return post
 
-# Create your models here. 
 class Post(models.Model,):
     id_post = models.CharField(unique=True, max_length=13)
     user = models.ForeignKey(
@@ -22,6 +19,7 @@ class Post(models.Model,):
     hide_like = models.BooleanField(default=False)
     hide_comment = models.BooleanField(default=False)
     comment = models.CharField(max_length=1500)
+    visibility = models.CharField(max_length=20, default='all')
     objects = PostManager()
     
     class Meta:

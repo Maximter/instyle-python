@@ -10,6 +10,7 @@ urlpatterns = [
     path('delete/<str:id_post>/', views_post_page.delete_post),
     path('edit/<str:id_post>/', views_post_page.update_post_comment),
     path('comment/<str:id_post>/', views_post_page.send_comment),
+    path('edit-visibility/<str:id_post>/', views_post_page.edit_visibility),
     path('hide-like/<str:id_post>/', views_post_page.hide_like),
     path('hide-comment/<str:id_post>/', views_post_page.hide_comment),
     path('edit-comment/<str:id_interaction>/', views_post_page.edit_comment),

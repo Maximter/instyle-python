@@ -55,6 +55,21 @@
         {%endif%}
       </div>
 
+    {%if user.id == post.user.id%}
+      {%if post.visibility == 'all'%}
+        <p class="show-visibility">Область видимости: Общий доступ</p>
+      {%endif%}
+      {%if post.visibility == 'link'%}
+        <p class="show-visibility">Область видимости: Доступ по ссылке</p>
+      {%endif%}
+      {%if post.visibility == 'follower'%}
+        <p class="show-visibility">Область видимости: Доступ для подписчиков</p>
+      {%endif%}
+      {%if post.visibility == 'nobody'%}
+        <p class="show-visibility">Область видимости: Пост архивирован</p>
+      {%endif%}
+    {%endif%}
+
       <div class="under-post-buttons">
         {%if user.post_interaction.like%}
             <img src="{% static 'img/system/liked.svg' %}" title="Нравится" class="like" onclick="like(this, '{{post.id_post}}')">
@@ -62,33 +77,46 @@
             <img src="{% static 'img/system/notification-empty.svg' %}" title="Нравится" class="like" onclick="like(this, '{{post.id_post}}')">
         {%endif%}
 
-        {%if post.hide_like == False%}
+        {%if post.hide_like == False or user.id == post.user.id%}
             <p class="comment-text" style="margin: 0 0 0 10px;"><span style="font-weight: 500; " id="likes_{{post.id_post}}" likes="{{post.interaction.like_count}}" >Отметок нравится: {{post.interaction.like_count}}</span></p>
         {%else%}
         <p class="comment-text" style="margin: 0 0 0 10px;"><span style="font-weight: 500; " id="likes_{{post.id_post}}" >Нравится некоторым людям</span></p>
             {%endif%}
-          </div>
-        
-       <div class="comments">
-          {%if post.comment%}<p class="comment-text"><a href="/user/{{user.username}}"><span style="font-weight: 500;">{{post.user.username}}:</span></a> {{post.comment}}</p>{%endif%}
-          {%if post.hide_comment == False%}
-          <div class="under-comment">
-          {%for this in post.interaction.info%}
-          <div style="display: flex; margin-bottom: 9px;">
-          <p class="comment-text"><a href="/user/{{this.user.username}}"><span style="font-weight: 500;">{{this.user.username}}:</span></a> {{this.comment}}</p>
-          {%if this.user.id == user.id%}
-          <img src="{% static 'img/system/more.svg' %}" title="Ещё" class="small-more" id_post="{{this.id}}" comment="{{this.comment}}"  onclick="smallMore(this)">
-          {%else%}
-            {%if user.id == post.user.id%}
-            <img src="{% static 'img/system/more.svg' %}" title="Ещё" class="small-more" id_post="{{this.id}}" comment="{{this.comment}}" onclick="ownerSmallMore(this)">
-            {%endif%}
-          {%endif%}
-        </div>
-          {%endfor%}
+      </div>
 
+       <div class="comments">
+          {%if post.comment%}
+            <p class="comment-text">
+              <a href="/user/{{user.username}}">
+                <span style="font-weight: 500;">{{post.user.username}}:</span>
+              </a> 
+              {{post.comment}}
+            </p>
+          {%endif%}
+
+          {%if post.hide_comment == False or user.id == post.user.id%}
+            <div class="under-comment">
+            {%for this in post.interaction.info%}
+              <div style="display: flex; margin-bottom: 9px;">
+              <p class="comment-text"><a href="/user/{{this.user.username}}"><span style="font-weight: 500;">{{this.user.username}}:</span></a> {{this.comment}}</p>
+              {%if this.user.id == user.id%}
+                <img src="{% static 'img/system/more.svg' %}" title="Ещё" class="small-more" id_post="{{this.id}}" comment="{{this.comment}}"  onclick="smallMore(this)">
+              {%else%}
+                {%if user.id == post.user.id%}
+                  <img src="{% static 'img/system/more.svg' %}" title="Ещё" class="small-more" id_post="{{this.id}}" comment="{{this.comment}}" onclick="ownerSmallMore(this)">
+                {%endif%}
+              {%endif%}
+              </div>
+            {%endfor%}
+            </div>
+          {%endif%}
+
+
+        
         </div>
-        {%endif%}
-        </div>
+
+        
+
       {%if post.hide_comment == False%}
       <div class="input-box">
         <input type="text" class="input-text" id="input_comment" placeholder="Оставить комментарий...">
@@ -122,16 +150,16 @@
 
         if (el.src.indexOf('notification') > -1) {
           el.src = "/static/img/system/liked.svg";
-          if (!hide_like)
+          if (hide_like == 'False')
             count.attributes.likes.value = ++count.attributes.likes.value;
         }
         else {
           el.src = "/static/img/system/notification-empty.svg";
-          if (!hide_like)
+          if (hide_like == 'False')
             count.attributes.likes.value = --count.attributes.likes.value;
           
         }
-        if (!hide_like)
+        if (hide_like == 'False')
           count.innerHTML = `Отметок нравится: ${count.attributes.likes.value}`;
       }
 
@@ -452,6 +480,50 @@
            })
          })
     }
+    
+    function edit_visibility(id_post) {
+      Swal.fire({
+      position: 'top',
+      icon: 'warning',
+      title: 'Выберете новую область видимости',
+      html:`   <div class="more-menu">
+        <select name="new-visibility" id="new-visibility" class="new-visibility">
+          <option value="all">Открытый доступ</option>
+          <option value="follower">Доступ для подписчиков</option>
+          <option value="link">Доступ по ссылке</option>
+          <option value="nobody">Архивировать запись</option>
+        </select>
+      </div>`, 
+      confirmButtonText: 'Сохранить',
+    }).then((result) => {
+     if (result.isConfirmed) {
+       const new_visibility = document.getElementById('new-visibility').value
+       const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+       fetch(`${window.location.origin}/post/edit-visibility/${id_post}/`, {
+         method: "post",
+         body: JSON.stringify({'visibility': new_visibility}),
+         headers: {
+           'Accept': 'application/json',
+           'Content-Type': 'application/json',
+           'X-CSRFToken': csrftoken,
+         },
+       }).then(response => response)
+         .then(result => { 
+           Swal.fire({
+             position: 'top',
+             icon: 'success',
+             title: 'Область видимости была изменена',
+             showConfirmButton: false,
+             timer: 1000
+           }).then(() => {
+             window.location.href = `${window.location.origin}/post/${id_post}/`
+           })
+         })
+     }
+     
+     });
+    }
+    
     </script>
 
     <script>
@@ -472,6 +544,7 @@
       <p onclick="edit_comment('{{post.comment|stringformat:"i"}}', '{{post.id_post}}')">Редактировать описание</p>
       <p onclick="hide_like('{{post.id_post}}')">${word_like} число отметок "Нравится"</p>
       <p onclick="hide_comment('{{post.id_post}}')">${word_comment} комментарии</p>
+      <p onclick="edit_visibility('{{post.id_post}}')">Изменить область видимости поста</p>
       <p onclick="close_menu()" style="border-bottom: none;">Отмена</p>
     </div>`, 
         

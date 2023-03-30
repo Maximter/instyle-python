@@ -155,6 +155,9 @@ def delete_comment_from_db(user, id_interaction):
     model_interaction.update(comment='')
     return
 
+def edit_visibility_db(post, visibility):
+    return Post.objects.filter(id=post.id).update(visibility=str(visibility))
+
 def update_hide_like(post):
     try:
         model_post = Post.objects.filter(id=post.id,)
