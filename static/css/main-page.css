@@ -177,6 +177,14 @@ li {
     cursor: pointer;
 }
 
+.comments {
+    width: 85%;
+    margin-top: 5px;
+    margin-bottom: 15px;
+    padding-right: 5px;
+    max-height: 100px;
+}
+
 .button_more {
     padding: 7px;
     height: 45px;
@@ -191,8 +199,70 @@ li {
     border: none
 }
 
+
+.small-more {
+    width: 10px;
+    cursor: pointer;
+    margin: 10px 0 0 3px;
+}
+
+.more-menu {
+    background-color: #fff;
+    display: flex; 
+    flex-direction: column; 
+    justify-content: center;
+}
+
+.post-info-textbox {
+    padding: 10px;
+    max-width: 440px;
+    max-height: 60vh;
+    min-width: 440px;
+    min-height: 180px;
+}
+
+.more-menu p {
+    width: 100%;
+    cursor: pointer;
+    background-color: #fff;
+    padding: 20px;
+    border-bottom: 1px solid rgb(219, 219, 219);
+    border-bottom: 1px solid rgb(219, 219, 219);
+}
+
+.more-menu p:hover {
+    background-color: #f7f7f7;
+}
+
 .share {
     width: 24px;
     margin-left: 10px;
     cursor: pointer;
+}
+
+.under-comment {
+    display: flex;
+    flex-wrap: wrap;
+    margin-top: 10px;
+    flex-direction: column;
+    align-content: flex-start;
+    align-items: flex-start;
+}
+
+.under-post {
+    display: flex;
+    overflow: hidden;
+    width: 85%;
+    margin-top: 5px;
+    min-height: 24px;
+}
+
+.under-post-likes {
+    width: 85%;
+    overflow: hidden;
+    min-height: 26px;
+}
+
+.comment-text {
+    font-size: 14px;
 }

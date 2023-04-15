@@ -71,17 +71,17 @@
     {%endif%}
 
       <div class="under-post-buttons">
-        {%if user.post_interaction.like%}
-            <img src="{% static 'img/system/liked.svg' %}" title="Нравится" class="like" onclick="like(this, '{{post.id_post}}')">
+        {%if user.like%}
+            <img src="{% static 'img/system/liked.svg' %}" id="like_button" title="Нравится" class="like" user_liked="true" onclick="like(this, '{{post.id_post}}')">
         {%else%}
-            <img src="{% static 'img/system/notification-empty.svg' %}" title="Нравится" class="like" onclick="like(this, '{{post.id_post}}')">
+            <img src="{% static 'img/system/notification-empty.svg' %}" id="like_button" title="Нравится" class="like" user_liked="false" onclick="like(this, '{{post.id_post}}')">
         {%endif%}
 
-        {%if post.hide_like == False or user.id == post.user.id%}
+        {%if post.hide_like == False%}
             <p class="comment-text" style="margin: 0 0 0 10px;"><span style="font-weight: 500; " id="likes_{{post.id_post}}" likes="{{post.interaction.like_count}}" >Отметок нравится: {{post.interaction.like_count}}</span></p>
         {%else%}
         <p class="comment-text" style="margin: 0 0 0 10px;"><span style="font-weight: 500; " id="likes_{{post.id_post}}" >Нравится некоторым людям</span></p>
-            {%endif%}
+        {%endif%}
       </div>
 
        <div class="comments">
@@ -97,13 +97,13 @@
           {%if post.hide_comment == False or user.id == post.user.id%}
             <div class="under-comment">
             {%for this in post.interaction.info%}
-              <div style="display: flex; margin-bottom: 9px;">
-              <p class="comment-text"><a href="/user/{{this.user.username}}"><span style="font-weight: 500;">{{this.user.username}}:</span></a> {{this.comment}}</p>
+              <div style="display: flex;">
+              <p class="comment-text"><a href="/user/{{this.user.username}}"><span style="font-weight: 500;">{{this.user.username}}:</span></a> {{this.comment_text}}</p>
               {%if this.user.id == user.id%}
-                <img src="{% static 'img/system/more.svg' %}" title="Ещё" class="small-more" id_post="{{this.id}}" comment="{{this.comment}}"  onclick="smallMore(this)">
+                <img src="{% static 'img/system/more.svg' %}" title="Ещё" class="small-more" id_post="{{this.id}}" comment="{{this.comment_text}}"  onclick="smallMore(this)">
               {%else%}
                 {%if user.id == post.user.id%}
-                  <img src="{% static 'img/system/more.svg' %}" title="Ещё" class="small-more" id_post="{{this.id}}" comment="{{this.comment}}" onclick="ownerSmallMore(this)">
+                  <img src="{% static 'img/system/more.svg' %}" title="Ещё" class="small-more" id_post="{{this.id}}" comment="{{this.comment_text}}" onclick="ownerSmallMore(this)">
                 {%endif%}
               {%endif%}
               </div>
@@ -135,7 +135,7 @@
     <script>
       edit_comment_val = ''
       id_post_val = ''
-      function like (el, id_img) {
+      function like (el, id_img, user_liked) {
         const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
         fetch(`${window.location.origin}/post/like/${id_img}/`, {
           method: "post",
@@ -147,9 +147,9 @@
         });
         const count = document.getElementById(`likes_${id_img}`);
         const hide_like = '{{post.hide_like}}'
-
         if (el.src.indexOf('notification') > -1) {
           el.src = "/static/img/system/liked.svg";
+
           if (hide_like == 'False')
             count.attributes.likes.value = ++count.attributes.likes.value;
         }
@@ -161,6 +161,7 @@
         }
         if (hide_like == 'False')
           count.innerHTML = `Отметок нравится: ${count.attributes.likes.value}`;
+        
       }
 
       function close_menu() {

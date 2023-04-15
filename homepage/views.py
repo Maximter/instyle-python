@@ -1,21 +1,14 @@
 from django.shortcuts import render
+from homepage.service import get_post_like_count, get_posts_in_homepage, get_user_post_interaction
 from user.service import get_user_by_token
 
 def index(request):
     user = get_user_by_token(request.COOKIES.get('instyle_token'))
-    context = {
-        'user': user
-    }
-    return render(request, 'homepage/index.html', context)
+    posts = get_posts(user)
+    return render(request, 'homepage/index.html', context = {'user': user, 'posts': posts})
 
-    # const user = await this.appService.getUser(req);
-    # const postsInfo = await this.appService.getPosts(user);
-    # const posts = await this.appService.getLikes(user, postsInfo);
-    # let recommendation;
-    # if (posts == undefined) {
-    #   const countLikes = await this.recommendstionService.getPopularPosts();
-    #   const popularPostsInfo = await this.recommendstionService.getPopularPostsFullData(countLikes);
-    #   recommendation = await this.appService.getLikes(user, popularPostsInfo);
-    # }
-  
-    # return res.render('index', { user: user, posts: posts, recommendation : recommendation });
+def get_posts(user, start=0):
+    posts = get_posts_in_homepage(user, start)
+    posts = get_post_like_count(posts) 
+    posts = get_user_post_interaction(user, posts)
+    return posts

@@ -2,8 +2,8 @@ import json
 from django.http import HttpResponse
 from django.shortcuts import render
 
-from post.service import delete_comment_from_db, delete_post_from_db, edit_comment_db, edit_visibility_db, get_model_post, get_post_interaction, get_post_interaction_by_id, get_user_post_interaction, save_like, send_comment_db, update_hide_comment, update_hide_like, update_post_comment_db
-from user.service import get_user_by_token
+from post.service import delete_comment_from_db, delete_post_from_db, edit_comment_db, edit_visibility_db, get_model_post, get_post_interaction, get_post_interaction_by_id, get_user_like, save_like, send_comment_db, update_hide_comment, update_hide_like, update_post_comment_db
+from user.service import get_user_by_token, is_follower
 
 
 def post_page(request, id_post):
@@ -14,12 +14,14 @@ def post_page(request, id_post):
     model_post.interaction = get_post_interaction(model_post)
     if user is not None:
         user.owner = user.id == model_post.user.id
-        user.post_interaction = get_user_post_interaction(user, model_post)
+        user.like = get_user_like(user, model_post)
         if not user.owner:
             if model_post.visibility == 'nobody':
                 return render(request, 'error/404.html')
-            # elif model_post.visibility == 'follower':
-                #TODO проверка на подписку на пользователя        
+            elif model_post.visibility == 'follower' and not is_follower(user, model_post.user):
+                return render(request, 'error/404.html')    
+    elif not model_post.visibility == 'all':
+        return render(request, 'error/404.html')
     return render(request, 'post/post_page.html', context={'user':user, 'post':model_post})
 
 
@@ -104,7 +106,7 @@ def edit_visibility(request, id_post):
     edit_visibility_db(model_post, visibility)
     return HttpResponse() 
 
-
+ 
 def get_comment(request):
     body_unicode = request.body.decode('utf-8')
     body_data = json.loads(body_unicode)

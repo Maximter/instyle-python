@@ -21,7 +21,7 @@ def get_owner(username):
 def get_posts_for_other(user, owner):
     try:
         if user.is_follower:
-            posts = Post.objects.filter(Q(user=owner) & Q(visibility='all') | Q(visibility='follower')).order_by('-id')
+            posts = Post.objects.filter(Q(user=owner) & (Q(visibility='all') | Q(visibility='follower'))).order_by('-id')
         else:
             posts = Post.objects.filter(Q(user=owner) & Q(visibility='all')).order_by('-id')
     except User.DoesNotExist:
@@ -45,10 +45,6 @@ def is_follower(follower, following):
         return True
     except Follow.DoesNotExist:
         return False
-
-
-def delete_relation(follower, following):
-    return
 
 
 def get_followers(user):

@@ -9,6 +9,17 @@ class PostManager(models.Manager):
         post = self.create(id_post=id_post, user=user, comment=comment)
         return post
 
+class Comment_Manage(models.Manager):
+    def create_post(self, post, user, comment_text,):
+        post = self.create(post=post, user=user, comment_text=comment_text,)
+        return post
+    
+class Like_Manage(models.Manager):
+    def create_post(self, post, user, ):
+        post = self.create(post=post, user=user, )
+        return post
+
+
 class Post(models.Model,):
     id_post = models.CharField(unique=True, max_length=13)
     user = models.ForeignKey(
@@ -25,28 +36,21 @@ class Post(models.Model,):
     class Meta:
         db_table = 'post'
 
-
-class Post_interactionManage(models.Manager):
-    def create_like(self, post, user):
-        post = self.create(post=post, user=user, like=True)
-        return post
-    
-    def create_comment(self, post, user, comment):
-        post = self.create(post=post, user=user, comment=comment)
-        return post
-
-class Post_interaction(models.Model,):
-    post = models.ForeignKey(
-        Post, 
-        on_delete=models.CASCADE,
-    )
-    user = models.ForeignKey(
-        User, 
-        on_delete=models.CASCADE,
-    )
-    like = models.BooleanField(default=False)
-    comment = models.CharField(default='', max_length=1500)
-    objects = Post_interactionManage()
+class Comment(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    post = models.ForeignKey(Post, related_name='comments', on_delete=models.CASCADE)
+    comment_text = models.TextField(max_length=1000)
+    commenting_date = models.DateTimeField(auto_now_add=True)
+    objects = Comment_Manage()
     
     class Meta:
-        db_table = 'post_interaction'
+        db_table = 'comment'
+
+class Like(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    post = models.ForeignKey(Post, on_delete=models.CASCADE)
+    liking_date = models.DateTimeField(auto_now_add=True)
+    objects = Like_Manage()
+
+    class Meta:
+        db_table = 'like'

@@ -8,7 +8,7 @@ from django.db.models import Case, Value, When
 from django.db.models import Q
 
 
-from post.models import Post, Post_interaction
+from post.models import Comment, Like, Post
 
 def check_valid_post(file, comment):
     if file is None:
@@ -79,16 +79,10 @@ def save_post_to_db(id_post, comment, user):
 def save_like(user, id_post):
     model_post = get_model_post(id_post)
     try:
-        interactions = Post_interaction.objects.filter(post=model_post.id, user=user.id)
-        if len(interactions) == 0:
-            raise Post_interaction.DoesNotExist
-        interactions.update(like=Case(
-            When(like=True, then=Value(False)),
-            When(like=False, then=Value(True)),
-        ))
-    except Post_interaction.DoesNotExist:
-        Post_interaction.objects.create_like(user= user, post=model_post)
-    
+        like = Like.objects.get(post=model_post.id, user=user.id)
+        like.delete()
+    except Like.DoesNotExist:
+        Like.objects.create_post(user=user, post=model_post)
     return
 
 def delete_post_from_db(user, id_post):
@@ -104,26 +98,29 @@ def update_post_comment_db(post, comment):
 def get_post_interaction(post):
     try:
         return {
-            'info': Post_interaction.objects.filter(post=post.id, comment=Q(comment='')),
-            'like_count': len(Post_interaction.objects.filter(post=post.id, like=True))
+            'info': Comment.objects.filter(post=post.id),
+            'like_count': len(Like.objects.filter(post=post.id))
         }
-    except Post_interaction.DoesNotExist:
+    except Comment.DoesNotExist:
+        return None
+    except Like.DoesNotExist:
         return None
 
 def get_post_interaction_by_id(id_interaction):
     try:
-        return Post_interaction.objects.get(id=id_interaction)
-    except Post_interaction.DoesNotExist:
+        return Comment.objects.get(id=id_interaction)
+    except Comment.DoesNotExist:
         return None
 
 def edit_comment_db(interaction, comment):
-    return Post_interaction.objects.filter(id=interaction.id).update(comment=str(comment))
+    return Comment.objects.filter(id=interaction.id).update(comment_text=str(comment))
 
-def get_user_post_interaction(user, post):
+def get_user_like(user, post):
     try:
-        return Post_interaction.objects.get(user=user.id, post=post.id)
-    except Post_interaction.DoesNotExist:
-        return None
+        like = Like.objects.get(user=user.id, post=post.id)
+        return True
+    except Like.DoesNotExist:
+        return False
 
 def get_model_post(id_post):
     try:
@@ -134,25 +131,23 @@ def get_model_post(id_post):
 
 def send_comment_db(user, post, comment):
     try:
-        interactions = Post_interaction.objects.filter(post=post.id, user=user.id)
-        if len(interactions) == 0:
-            raise Post_interaction.DoesNotExist
-        interactions.update(comment=comment)
-    except Post_interaction.DoesNotExist:
-        Post_interaction.objects.create_comment(user= user, post=post, comment=comment)
+        Comment.objects.create_post(user= user, post=post, comment_text=comment)
+    except:
+        print('Send comment Error')
+        return None
     
     return
 
 def delete_comment_from_db(user, id_interaction):
     try:
-        model_interaction = Post_interaction.objects.filter(id=id_interaction)
+        comment = Comment.objects.filter(id=id_interaction)
     except Post.DoesNotExist:
         return None
 
-    if user.id != model_interaction[0].user.id and model_interaction[0].post.user.id != user.id:
+    if user.id != comment[0].user.id and comment[0].post.user.id != user.id:
         return None
     
-    model_interaction.update(comment='')
+    comment.delete()
     return
 
 def edit_visibility_db(post, visibility):
@@ -162,12 +157,12 @@ def update_hide_like(post):
     try:
         model_post = Post.objects.filter(id=post.id,)
         if len(model_post) == 0:
-            raise Post_interaction.DoesNotExist
+            raise Post.DoesNotExist
         model_post.update(hide_like=Case(
             When(hide_like=True, then=Value(False)),
             When(hide_like=False, then=Value(True)),
         ))
-    except Post_interaction.DoesNotExist:
+    except Post.DoesNotExist:
         return None
     return
 
@@ -175,11 +170,11 @@ def update_hide_comment(post):
     try:
         model_post = Post.objects.filter(id=post.id,)
         if len(model_post) == 0:
-            raise Post_interaction.DoesNotExist
+            raise Post.DoesNotExist
         model_post.update(hide_comment=Case(
             When(hide_comment=True, then=Value(False)),
             When(hide_comment=False, then=Value(True)),
         ))
-    except Post_interaction.DoesNotExist:
+    except Post.DoesNotExist:
         return None
     return
