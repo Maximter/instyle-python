@@ -1,22 +1,30 @@
 <!DOCTYPE html>
+{% load static %}
 <html lang="ru">
   <head>
     <meta charset="utf-8" />
     <title>Instyle</title>
     <link rel="stylesheet" type="text/css" href="/static/css/settings.css"/>
-    <link rel="shortcut icon" type="image/x-icon" href="/img/system/title-logo.png" />
+    <link rel="shortcut icon" type="image/x-icon" href="/static/img/system/title-logo.png" />
   </head>
   <body>
     <header>
       <section>
         <a href="/"><p class="logo-name">Instyle</p></a>
         <div class="header-icons">
-          <a href="/"><img src="../img/system/home-empty.svg" alt="Главная страница" title="Главная страница"></a>
-          <a href="/chat"><img src="../img/system/chat-empty.svg" alt="Мессенджер" title="Мессенджер"></a>
-          <a href="/post"><img src="../img/system/add-empty.svg" alt="Добавить фотографию" title="Добавить фотографию"></a>
-          <a href="/recommendation"><img src="../img/system/compass-empty.svg" alt="Рекомендуемое" title="Рекомендуемое"></a>
-          <a href="/notification"><img src="../img/system/notification-empty.svg" alt="Уведомления" title="Уведомления"></a>
-           </div>
+          <a href="/"><img src="/static/img/system/home-empty.svg" alt="Главная страница" title="Главная страница"></a>
+          <a href="/chat"><img src="/static/img/system/chat-empty.svg" alt="Мессенджер" title="Мессенджер"></a>
+          <a href="/post"><img src="/static/img/system/add-empty.svg" alt="Добавить фотографию" title="Добавить фотографию"></a>
+          <a href="/recommendation"><img src="/static/img/system/compass-empty.svg" alt="Рекомендуемое" title="Рекомендуемое"></a>
+          <a href="/notification"><img src="/static/img/system/notification-empty.svg" alt="Уведомления" title="Уведомления"></a>
+          <a href="/user/{{user.username}}">
+            {%if user.avatar%}
+            <img src="{% static 'img/small/avatar/{{user.id}}.png' %}" alt="{{user.name_lastname}}" title="{{user.name_lastname}}" class="user-avatar" id="upper-avatar">
+            {%else%}
+            <img src="{% static 'img/small/avatar/standard.png' %}" alt="{{user.name_lastname}}" title="{{user.name_lastname}}" class="user-avatar" id="upper-avatar">
+            {%endif%}
+        </a>   
+        </div>
       </section>
     </header>
     
@@ -25,8 +33,9 @@
       <h1>Настройки</h1>
 
       <div class="settings-block">
+        
         <form action="/settings/change-avatar" enctype="multipart/form-data" method="post">
-          
+          {% csrf_token %}
           <div class="name-section">
             <h3>Изменить аватар</h3>
           </div>
@@ -43,11 +52,11 @@
           <button>Изменить</button>
         </form>
 
-
+       
         <form action="/settings/edit-profile" method="post">
-          
+          {% csrf_token %}
           <div class="name-section">
-            <img src="../img/system/edit.svg" alt="Профиль" title="Профиль" class="name-section-img">
+            <img src="/static/img/system/edit.svg" alt="Профиль" title="Профиль" class="name-section-img">
             <h3>Редактировать профиль</h3>
           </div>
           
@@ -63,7 +72,7 @@
 
           <div class="block-change">
             <h5>О себе</h5>
-              </div>
+          </div>
 
            <div class="block-change">
             <h5>Ваш эл. адрес</h5>
@@ -77,7 +86,7 @@
         <form action="/settings/change-password" method="post">
           
           <div class="name-section">
-            <img src="../img/system/lock.svg" alt="Профиль" title="Профиль" class="name-section-img">
+            <img src="/static/img/system/lock.svg" alt="Профиль" title="Профиль" class="name-section-img">
             <h3>Сменить пароль</h3>
           </div>
           
@@ -105,8 +114,8 @@
     </section>
 
 <script src="/socket.io/socket.io.js"></script>
-  <script src="../js/sockets.js"></script>
-  <script src="../js/sweetalert2.all.min.js"></script>
+  <script src="/static/js/sockets.js"></script>
+  <script src="/static/js/sweetalert2.all.min.js"></script>
   <script>
     const input_image = document.getElementById('input_file');
   const settings_avatar = document.getElementById('settings-avatar');
@@ -117,6 +126,39 @@
   }
   </script>
 
+{% if response.err %}
+    <script>
+      Swal.fire({
+        title: 'Ошибка!',
+        text: '{{response.err}}',
+        icon: 'error',
+        confirmButtonText: 'Повторить попытку'
+      })
+    </script>
+{% endif %}
+
+{% if response.warn %}
+    <script>
+
+      Swal.fire({
+        title: 'Внимание!',
+        text: '{{response.warn}}',
+        icon: 'warning',
+        confirmButtonText: 'Продолжить'
+      })
+    </script>
+{% endif %}
+
+{% if response.success %}
+    <script>
+      Swal.fire({
+        title: 'Успешно',
+        text: '{{response.success}}',
+        icon: 'success',
+        confirmButtonText: 'Продолжить'
+      })
+    </script>
+{% endif %}
 
   </body>
 </html>

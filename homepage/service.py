@@ -1,6 +1,7 @@
 from post.models import Comment, Like, Post
 from user.models import Follow
-from django.db.models import Q
+from django.db.models import Count
+from django.db.models import Q, Case, When, BooleanField
 
 def get_posts_in_homepage(user, start):
     try:
@@ -13,20 +14,15 @@ def get_posts_in_homepage(user, start):
             Post.objects.filter(Q(user_id__in=followings) & \
                                 ~Q(visibility='nobody') & \
                                 ~Q(visibility='link') | \
-                                Q(user=user.id)).order_by('-id')[start:10]
+                                Q(user=user.id)).order_by('-id').prefetch_related('likes')[start:10]
+        print(posts)
     except Post.DoesNotExist:
         return None
     return posts
 
 
 def get_post_like_count(posts):
-    #TODO REDO
-    try:
-        for this in posts:
-            this.like_count = len(Like.objects.filter(post=this.id))
-    except Comment.DoesNotExist or Like.DoesNotExist:
-        pass
-    return posts
+    return posts.prefetch_related('likes').annotate(like_count=Count('likes'))
 
 def get_user_post_interaction(user, posts):
     #TODO REDO

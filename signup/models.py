@@ -16,7 +16,7 @@ class TokenManager(models.Manager):
 class User(models.Model,):
     email = models.CharField(unique=True, max_length=45)
     name_lastname = models.CharField(max_length=40)
-    username = models.CharField(unique=True, max_length=20)
+    username = models.CharField(unique=True, max_length=30)
     password = models.CharField(max_length=105)
     bio = models.CharField(max_length=300, default='')
     avatar = models.BooleanField(default=False)

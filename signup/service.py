@@ -21,12 +21,12 @@ def valid_user(user: User):
     
     if len(user['name_lastname']) < 4:
         return 'Слишком короткое имя и фамилия'
-    elif len(user['name_lastname']) > 39:
+    elif len(user['name_lastname']) > 30:
         return 'Слишком длинное имя и фамилия'
     
     if len(user['username']) < 4:
         return 'Слишком короткое имя пользователя'
-    elif len(user['username']) > 39:
+    elif len(user['username']) > 30:
         return 'Слишком длинное имя пользователя'
     
     existEmail = User.objects.filter(email=user['email'])
