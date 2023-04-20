@@ -24,5 +24,4 @@ def create(request):
     if err_valid_user:
         return render(request, 'signup/index.html', context={'err': err_valid_user})
     else: create_user(user)
-    #TODO Отправить письмо, подтверждающее почту
     return render(request, 'signup/index.html', context={'success': True})

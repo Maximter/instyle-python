@@ -4,6 +4,7 @@ from django.contrib.auth.hashers import check_password
 import hashlib
 from django.core.mail import send_mail
 from django.conf import settings
+import asyncio
 
 
 def check_user_exist(user):
@@ -22,6 +23,14 @@ def check_user_exist(user):
         'err': 'Введено неверное имя пользователя или пароль',
         'warn': '',
         }
+    elif user_model.verificated == 0:
+        send_mail_func(user_model)
+        user_exist = {
+        'user': user,
+        'valid' : False,
+        'err': '',
+        'warn': 'Ваш эл. адрес не был подтверждён. Для получения доступа к сервису перейдите по ссылке из отправленного письма',
+        }
     else:
         user_exist = {
         'user': user,
@@ -30,15 +39,7 @@ def check_user_exist(user):
         'err': '',
         'warn': '',
         }
-    if user_model.verificated == 0:
-        #TODO Снова отправить письмо на почту
-        send_mail_func(user_model)
-        user_exist = {
-        'user': user,
-        'valid' : False,
-        'err': '',
-        'warn': 'Ваш эл. адрес не был подтверждён. Для получения доступа к сервису перейдите по ссылке из отправленного письма',
-        }
+    
     
     return user_exist
 
@@ -50,10 +51,10 @@ def get_token(user):
     return token.token
 
 def send_mail_func(user):
-    key = hashlib.sha1(user.email.encode('utf-8'))
+    key = hashlib.sha1((user.email).encode('utf-8')).hexdigest()
     Token.objects.filter(user=user.id).update(confirmation_key=key)
     subject = 'Подтверждение регистрации'
     message = f'Для подтверждения регистрации перейдите по ссылке: {settings.BASE_URL}/login/confirm?key={key}'
-    from_email = 'noreply@myproject.com'
-    recipient_list = [user.email, ]
+    from_email = 'm-a-x-o-k@yandex.ru'
+    recipient_list = [user.email,]
     send_mail(subject, message, from_email, recipient_list)

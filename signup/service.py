@@ -1,4 +1,6 @@
 import re
+
+from login.service import send_mail_func
 from .models import User, Token
 from django.contrib.auth.hashers import make_password
 
@@ -43,5 +45,6 @@ def create_user(user):
     hash_password = make_password(user['password'])
     user = User.objects.create_user(email = user['email'], name_lastname = user['name_lastname'], 
                                     username = user['username'], password = hash_password)
+    send_mail_func(user)
     Token.objects.create_token(user = user)
     return

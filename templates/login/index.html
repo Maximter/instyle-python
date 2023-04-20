@@ -27,9 +27,8 @@
 
     <script src="{% static "js/particles.js" %}"></script>
     <script src="{% static "js/particles-start.js" %}"></script>
-
-    {% if err %}
     <script src="{% static "js/sweetalert2.all.min.js" %}"></script>
+    {% if err %}
     <script>
       document.getElementById('username').value = '{{user.username}}';
       document.getElementById('password').value = '{{user.password}}';
@@ -44,7 +43,6 @@
 {% endif %}
 
 {% if warn %}
-<script src="{% static "js/sweetalert2.all.min.js" %}"></script>
     <script>
       document.getElementById('username').value = '{{user.username}}';
 
@@ -58,7 +56,7 @@
 {% endif %}
 
 {% if success %}
-<script src="{% static "js/sweetalert2.all.min.js" %}"></script>
+
     <script>
       Swal.fire({
         title: 'Успешно',
@@ -69,6 +67,23 @@
           if (result.isConfirmed) window.location.href = '/'
         })
     </script>
+{% endif %}
+
+{% if messages %}
+  {% for message in messages %}
+
+{% if message.tags == 'success' %}
+    <script>
+      Swal.fire({
+        title: 'Успешно',
+        text: '{{message}}',
+        icon: 'success',
+        confirmButtonText: 'Продолжить'
+      })
+    </script>
+{% endif %}
+
+  {% endfor %}
 {% endif %}
   </body>
 </html>
