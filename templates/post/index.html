@@ -68,7 +68,12 @@
     <script src="{% static 'js/sweetalert2.all.min.js' %}" ></script>
     <script src="{% static 'js/upload-image.js' %}"></script>
     <script src="{% static 'js/post-img-buttons.js' %}"></script>
-    {%if err%}
+
+
+    {% if messages %}
+    {% for message in messages %}
+  
+    {% if message.tags == 'error' %}
       <script>
         document.getElementById('comment').value = '{{comment}}';
         uploaded_image_block.style.display = "none"
@@ -76,29 +81,32 @@
 
         Swal.fire({
           title: 'Ошибка',
-          text: '{{err}}',
+          text: '{{message}}',
           icon: 'error',
           confirmButtonText: 'Повторить попытку'
         })
       </script>
-    {%endif%}
-
-    
-    {%if success%}
+  {% endif %}
+  
+  {% if message.tags == 'success' %}
       <script>
-        uploaded_image_block.style.display = "none"
+         uploaded_image_block.style.display = "none"
         uploaded_image.src = "#"
 
         Swal.fire({
           title: 'Готово',
-          text: '{{success}}',
+          text: '{{message}}',
           icon: 'success',
           confirmButtonText: 'Хорошо'
         }).then((result) => {
         if (result.isConfirmed) window.location.href = '/user/{{user.username}}'
       })
       </script>
-     {%endif%}
+  {% endif %}
+  
+    {% endfor %}
+  {% endif %}
+
 
     <script src="/socket.io/socket.io.js"></script>
   <script src="../js/sockets.js"></script>

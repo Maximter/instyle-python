@@ -19,6 +19,7 @@ def edit_profile(request):
         'name_lastname': request.POST.get('name_lastname'),
         'username': request.POST.get('username'),
         'email': request.POST.get('email'),
+        'bio': request.POST.get('bio'),
     }
     response = edit_profile_data(user, user_old)
     if response['err']:
@@ -38,12 +39,13 @@ def change_avatar(request):
     return redirect('/settings')
 
 def change_password(request):
+    user = get_user_by_token(request.COOKIES.get('instyle_token'))
     passwords = {
-        'old_pass': request.POST.get('old_pass'),
-        'new_pass': request.POST.get('new_pass'),
-        'new_pass2': request.POST.get('new_pass2'),
+        'old_pass': request.POST.get('old-pass'),
+        'new_pass': request.POST.get('new-pass'),
+        'new_pass2': request.POST.get('new-pass2'),
     }
-    response = update_password(passwords)
+    response = update_password(passwords, user)
     if response['err']:
         messages.error(request, response['err'])
     else:

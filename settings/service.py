@@ -1,6 +1,6 @@
 from signup.models import User, UserProfile
 import re
-from PIL import Image
+from django.contrib.auth.hashers import check_password, make_password
 
 
 def edit_profile_data(user, user_old):
@@ -11,6 +11,12 @@ def edit_profile_data(user, user_old):
     except Exception as err:
         response['err'] = str(err)
         return response
+    
+    profile = UserProfile.objects.get(user=user_old.id)
+    if not profile.bio == user['bio']:
+        change = True
+        profile.bio = user['bio']
+        profile.save()
     
     if not user['name_lastname'] == user_old.name_lastname:
         change = True
@@ -28,7 +34,7 @@ def edit_profile_data(user, user_old):
     
 
 def save_avatar(user, form):
-    response = {}
+    response = {'err': '', 'warn': '', 'success': ''}
     if form.is_valid():
         photo = form.cleaned_data['photo']
         photo.name = f'{user.id}'
@@ -58,6 +64,8 @@ def check_valid_update(user, user_old):
         raise Exception ('Слишком короткое имя пользователя')
     elif len(user['username']) > 30:
         raise Exception ('Слишком длинное имя пользователя')
+    elif len(user['bio']) > 300:
+        raise Exception ('Слишком описание пользователя')
     
 
     if not user['username'] == user_old.username:
@@ -75,5 +83,11 @@ def check_valid_update(user, user_old):
             pass
        
 
-def update_password(passwords):
-    return
+def update_password(passwords, user):
+    if not passwords['new_pass'] == passwords['new_pass2']:
+        return {'err' : 'Новые пароли не совпадают'}
+    if not check_password(passwords['old_pass'], user.password):
+        return {'err' : 'Старый пароль введён неверно'}
+    hash_password = make_password(passwords['new_pass'])
+    User.objects.filter(id=user.id).update(password=hash_password)
+    return {'err': '', 'success': 'Пароль был успешно изменён'}
