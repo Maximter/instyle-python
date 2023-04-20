@@ -18,10 +18,10 @@
           <a href="/recommendation"><img src="/static/img/system/compass-empty.svg" alt="Рекомендуемое" title="Рекомендуемое"></a>
           <a href="/notification"><img src="/static/img/system/notification-empty.svg" alt="Уведомления" title="Уведомления"></a>
           <a href="/user/{{user.username}}">
-            {%if user.avatar%}
-            <img src="{% static 'img/small/avatar/{{user.id}}.png' %}" alt="{{user.name_lastname}}" title="{{user.name_lastname}}" class="user-avatar" id="upper-avatar">
+            {%if profile.avatar_small%}
+            <img src="/static/img/small/avatar/{{user.id}}.jpg" alt="{{user.name_lastname}}" title="{{user.name_lastname}}" class="user-avatar" id="upper-avatar">
             {%else%}
-            <img src="{% static 'img/small/avatar/standard.png' %}" alt="{{user.name_lastname}}" title="{{user.name_lastname}}" class="user-avatar" id="upper-avatar">
+            <img src="/static/img/small/avatar/standard.jpg" alt="{{user.name_lastname}}" title="{{user.name_lastname}}" class="user-avatar" id="upper-avatar">
             {%endif%}
         </a>   
         </div>
@@ -39,13 +39,18 @@
           <div class="name-section">
             <h3>Изменить аватар</h3>
           </div>
-          
+          {{form.as_p}}
+          <!-- {%if profile.avatar_big%}
+          <img src="/static/img/big/avatar/{{user.id}}.jpg" alt="{{user.name_lastname}}" title="{{user.name_lastname}}" class="user-big-avatar" id="settings-avatar">
+          {%else%}
+          <img src="/static/img/big/avatar/standard.jpg" alt="{{user.name_lastname}}" title="{{user.name_lastname}}" class="user-big-avatar" id="settings-avatar">
+          {%endif%} -->
            
-          <p class="paste-photo-text">Выберете фотографию с устройства</p>
-          <input type="file" class="input__file" name="avatar" id="input_file" accept=".jpeg,.jpg">
-          <label for="input_file" class="input__file-button">
+          <!-- <p class="paste-photo-text">Выберете фотографию с устройства</p> -->
+          <!-- <input type="file" class="input__file" name="avatar" id="input_file" accept=".jpeg,.jpg"> -->
+          <!-- <label for="input_file" class="input__file-button">
               <span class="input__file-button-text">Выбрать фотографию</span>
-          </label>
+          </label> -->
 
           <div class="block-change">
 
@@ -84,7 +89,7 @@
 
 
         <form action="/settings/change-password" method="post">
-          
+          {% csrf_token %}
           <div class="name-section">
             <img src="/static/img/system/lock.svg" alt="Профиль" title="Профиль" class="name-section-img">
             <h3>Сменить пароль</h3>
@@ -107,6 +112,9 @@
 
           <button class="last-element">Изменить</button>
         </form>
+
+
+
       
         
       </div>
@@ -126,38 +134,32 @@
   }
   </script>
 
-{% if response.err %}
+{% if messages %}
+  {% for message in messages %}
+
+  {% if message.tags == 'error' %}
     <script>
       Swal.fire({
         title: 'Ошибка!',
-        text: '{{response.err}}',
+        text: '{{message}}',
         icon: 'error',
         confirmButtonText: 'Повторить попытку'
       })
     </script>
 {% endif %}
 
-{% if response.warn %}
+{% if message.tags == 'success' %}
     <script>
-
       Swal.fire({
-        title: 'Внимание!',
-        text: '{{response.warn}}',
-        icon: 'warning',
+        title: 'Успешно',
+        text: '{{message}}',
+        icon: 'success',
         confirmButtonText: 'Продолжить'
       })
     </script>
 {% endif %}
 
-{% if response.success %}
-    <script>
-      Swal.fire({
-        title: 'Успешно',
-        text: '{{response.success}}',
-        icon: 'success',
-        confirmButtonText: 'Продолжить'
-      })
-    </script>
+  {% endfor %}
 {% endif %}
 
   </body>

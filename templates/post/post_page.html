@@ -18,10 +18,10 @@
           <a href="/recommendation"><img src="{% static "img/system/compass-empty.svg" %}" alt="Рекомендуемое" title="Рекомендуемое"></a>
           <a href="/notification"><img src="{% static "img/system/notification-empty.svg" %}" alt="Уведомления" title="Уведомления"></a>
           <a href="/user/{{user.username}}">
-            {%if user.avatar%}
-            <img src="{% static 'img/small/avatar/{{user.id}}.png' %}" alt="{{user.name_lastname}}" title="{{user.name_lastname}}" class="user-avatar" id="upper-avatar">
+            {%if profile.avatar_small%}
+            <img src="/static/img/small/avatar/{{user.id}}.jpg" alt="{{user.name_lastname}}" title="{{user.name_lastname}}" class="user-avatar" id="upper-avatar">
             {%else%}
-            <img src="{% static 'img/small/avatar/standard.png' %}" alt="{{user.name_lastname}}" title="{{user.name_lastname}}" class="user-avatar" id="upper-avatar">
+            <img src="/static/img/small/avatar/standard.jpg" alt="{{user.name_lastname}}" title="{{user.name_lastname}}" class="user-avatar" id="upper-avatar">
             {%endif%}
         </a></div>
       </section>
@@ -32,10 +32,10 @@
       <div class="photo-section">
         <div class="owner-block">
           <a href="/user/{{post.user.username}}" style="display: flex;">
-            {%if post.user.avatar%}
-            <img src="{% static 'img/small/avatar/{{post.user.id}}.png' %}" alt="{{post.user.name_lastname}}" title="{{post.user.name_lastname}}" class="owner-avatar">
+            {%if profile.avatar_small%}
+            <img src="/static/img/small/avatar/{{user.id}}.jpg" alt="{{user.name_lastname}}" title="{{user.name_lastname}}" class="user-avatar owner-avatar" id="upper-avatar">
             {%else%}
-            <img src="{% static 'img/small/avatar/standard.png' %}" alt="{{post.user.name_lastname}}" title="{{post.user.name_lastname}}" class="owner-avatar">
+            <img src="/static/img/small/avatar/standard.jpg" alt="{{user.name_lastname}}" title="{{user.name_lastname}}" class="user-avatar owner-avatar" id="upper-avatar">
             {%endif%}
             <p class="owner-username">{{post.user.username}}</p>   
           </a>

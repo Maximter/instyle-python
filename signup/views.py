@@ -20,7 +20,6 @@ def create(request):
         'username': request.POST.get('username').strip(),
         'password': request.POST.get('password').strip(),
     }
-
     err_valid_user = valid_user(user)
     if err_valid_user:
         return render(request, 'signup/index.html', context={'err': err_valid_user})

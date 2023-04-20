@@ -18,10 +18,10 @@
           <a href="/recommendation"><img src="{% static 'img/system/compass-empty.svg' %}" alt="Рекомендуемое" title="Рекомендуемое"></img></a>
           <a href="/notification"><img src="{% static 'img/system/notification-empty.svg' %}" alt="Уведомления" title="Уведомления"></img></a>
           <a href="/user/{{user.username}}">
-            {%if user.avatar%}
-              <img src="{% static './img/small/avatar/{{user.id}}.png' %}" alt="{{user.name_lastname}}" title="{{user.name_lastname}}" class="user-avatar">
+            {%if profile.avatar_small%}
+            <img src="/static/img/small/avatar/{{user.id}}.jpg" alt="{{user.name_lastname}}" title="{{user.name_lastname}}" class="user-avatar" id="upper-avatar">
             {%else%}
-              <img src="{% static './img/small/avatar/standard.png' %}" alt="{{user.name_lastname}}" title="{{user.name_lastname}}" class="user-avatar">
+            <img src="/static/img/small/avatar/standard.jpg" alt="{{user.name_lastname}}" title="{{user.name_lastname}}" class="user-avatar" id="upper-avatar">
             {%endif%}
           </a>
         </div>
@@ -36,10 +36,10 @@
           {% for this in posts%}
             <li>
               <a href="/user/{{this.user.username}}" class="owner-block">
-                {%if this.user.avatar%}
-                <img src="{% static 'img/small/avatar/{{this.user.id}}.png' %}" alt="{{this.user.name_lastname}}" title="{{this.user.name_lastname}}" class="owner-avatar">
+                {%if profile.avatar_small%}
+                <img src="/static/img/small/avatar/{{user.id}}.jpg" alt="{{user.name_lastname}}" title="{{user.name_lastname}}" class="user-avatar owner-avatar" id="upper-avatar">
                 {%else%}
-                <img src="{% static 'img/small/avatar/standard.png' %}" alt="{{this.user.name_lastname}}" title="{{this.user.name_lastname}}" class="owner-avatar">
+                <img src="/static/img/small/avatar/standard.jpg" alt="{{user.name_lastname}}" title="{{user.name_lastname}}" class="user-avatar owner-avatar" id="upper-avatar">
                 {%endif%}
             <p class="owner-username">{{this.user.username}}</p>
               </a>

@@ -1,5 +1,7 @@
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
+
+from signup.models import UserProfile
 from .service import follow_db, get_followers, get_followings, get_posts, get_posts_for_other, get_user_by_token, get_owner, is_follower
 
 def index(request):
@@ -9,6 +11,7 @@ def index(request):
 
 def user_page(request, username):
     user = get_user_by_token(request.COOKIES.get('instyle_token'))
+    profile = UserProfile.objects.get(user=user)
     owner = get_owner(username)
     if owner is None:
         return render(request, 'error/404.html')
@@ -29,6 +32,7 @@ def user_page(request, username):
         'user': user,
         'owner': owner,
         'posts': posts,
+        'profile':profile
     }
     return render(request, 'user/index.html', context)
 

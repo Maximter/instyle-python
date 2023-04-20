@@ -1,8 +1,6 @@
-from post.models import Comment, Like, Post
-from signup.models import User
-from user.models import Follow
-from django.db.models import Q
+from signup.models import User, UserProfile
 import re
+from PIL import Image
 
 
 def edit_profile_data(user, user_old):
@@ -28,9 +26,28 @@ def edit_profile_data(user, user_old):
         response['success'] = 'Данные профиля были изменены'
     return response
     
+
+def save_avatar(user, form):
+    response = {}
+    if form.is_valid():
+        photo = form.cleaned_data['photo']
+        photo.name = f'{user.id}'
+        user_model = User.objects.get(id=user.id)
+        profile = UserProfile.objects.get(user=user_model)
+        profile.avatar_big = photo
+        profile.avatar_medium = photo
+        profile.avatar_small = photo
+        profile.save()
+    else:
+        response['err'] = 'Произошла какая-то ошибка'
+        return response
+    response['success'] = 'Аватар был изменён'
+    return response
+    
+
+
 def check_valid_update(user, user_old):
     validNameLastname = re.match(r'^[A-Za-zА-Яа-я ]+$', user['name_lastname'])
-    print(len(user['username']))
     if not validNameLastname:
         raise Exception('Имя и фамилия должны содержать только буквы')
     if len(user['name_lastname']) < 4:
@@ -57,3 +74,6 @@ def check_valid_update(user, user_old):
         except User.DoesNotExist:
             pass
        
+
+def update_password(passwords):
+    return

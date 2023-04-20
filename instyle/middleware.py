@@ -8,7 +8,8 @@ def simple_middleware(get_response):
         url = request.path
         url_post = r'/post/[A-Za-z0-9]{12}'
 
-        if url == '/login/' or url == '/signup/' or url == '/login/login/':
+        if url == '/login/' or url == '/signup/' or\
+              url == '/login/login/' or url == '/signup/create/':
             return get_response(request)
         if request.method == 'GET' and re.match(url_post, url):
             return get_response(request)
