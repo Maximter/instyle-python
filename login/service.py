@@ -1,6 +1,9 @@
 import re
 from signup.models import Token, User
 from django.contrib.auth.hashers import check_password
+import hashlib
+from django.core.mail import send_mail
+from django.conf import settings
 
 
 def check_user_exist(user):
@@ -27,14 +30,15 @@ def check_user_exist(user):
         'err': '',
         'warn': '',
         }
-    # if user_model.verificated == 0:
-    #     #TODO Снова отправить письмо на почту
-    #     user_exist = {
-    #     'user': user,
-    #     'valid' : False,
-    #     'err': '',
-    #     'warn': 'Ваш эл. адрес не был подтверждён. Для получения доступа к сервису перейдите по ссылке из отправленного письма',
-    #     }
+    if user_model.verificated == 0:
+        #TODO Снова отправить письмо на почту
+        send_mail_func(user_model)
+        user_exist = {
+        'user': user,
+        'valid' : False,
+        'err': '',
+        'warn': 'Ваш эл. адрес не был подтверждён. Для получения доступа к сервису перейдите по ссылке из отправленного письма',
+        }
     
     return user_exist
 
@@ -44,3 +48,12 @@ def get_token(user):
     except Token.DoesNotExist:
         return None
     return token.token
+
+def send_mail_func(user):
+    key = hashlib.sha1(user.email.encode('utf-8'))
+    Token.objects.filter(user=user.id).update(confirmation_key=key)
+    subject = 'Подтверждение регистрации'
+    message = f'Для подтверждения регистрации перейдите по ссылке: {settings.BASE_URL}/login/confirm?key={key}'
+    from_email = 'noreply@myproject.com'
+    recipient_list = [user.email, ]
+    send_mail(subject, message, from_email, recipient_list)

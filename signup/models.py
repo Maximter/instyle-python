@@ -73,6 +73,7 @@ class Token(models.Model,):
         on_delete=models.CASCADE,
         primary_key=False,
     )
+    confirmation_key = models.CharField(max_length=60, blank=True)
     objects = TokenManager()
     
     class Meta:

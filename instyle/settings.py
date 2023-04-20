@@ -29,7 +29,7 @@ DEBUG = True
 ALLOWED_HOSTS = []
 # CSRF_COOKIE_DOMAIN = []
 
-
+BASE_URL = 'localhost:8000'
 
 # Application definition
 
@@ -123,6 +123,12 @@ LANGUAGE_CODE = 'ru'
 TIME_ZONE = 'Europe/Moscow'
 
 USE_I18N = True
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.yandex.com'
+EMAIL_PORT = 465
+EMAIL_USE_TLS = True
+
 
 # USE_TZ = True
 
