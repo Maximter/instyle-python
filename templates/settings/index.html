@@ -120,6 +120,7 @@
         
       </div>
       <button style="margin-bottom: 20px; background:#ff3535;" onclick="window.location='/login'">Выход</button>
+      <button style="margin-bottom: 20px; background:#ff3535;" onclick="delete_acc()">Удалить аккаунт</button>
     </section>
 
 <script src="/socket.io/socket.io.js"></script>
@@ -162,6 +163,37 @@
 
   {% endfor %}
 {% endif %}
+
+<script>
+  function delete_acc() {
+    Swal.fire({
+      position: 'top',
+      icon: 'warning',
+      title: 'Вы действительно хотите удалить свой аккаунт без возможности восстановления?',
+      confirmButtonText: 'Да',
+      showCancelButton: true,
+      cancelButtonText: 'Нет',
+      confirmButtonColor: '#ff3535',
+      cancelButtonColor: '#00cc00',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        fetch(`${window.location.origin}/settings/delete`, {
+          method: "post",
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrftoken,
+          },
+        }).then(response => response)
+          .then(result => { 
+              window.location.href = `${window.location.origin}/login/`
+          })
+      }
+      
+      });
+  }
+</script>
 
   </body>
 </html>

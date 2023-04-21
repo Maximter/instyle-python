@@ -3,7 +3,7 @@ from settings.forms import AvatarForm
 from settings.service import edit_profile_data, save_avatar, update_password
 from signup.models import UserProfile
 from user.service import get_user_by_token
-from django.http import QueryDict
+from django.http import HttpResponse, QueryDict
 from django.shortcuts import redirect
 from django.contrib import messages
 
@@ -37,6 +37,11 @@ def change_avatar(request):
     else:
         messages.success(request, response['success'])
     return redirect('/settings')
+
+def delete_user(request):
+    user = get_user_by_token(request.COOKIES.get('instyle_token'))
+    user.delete()
+    return HttpResponse()
 
 def change_password(request):
     user = get_user_by_token(request.COOKIES.get('instyle_token'))
