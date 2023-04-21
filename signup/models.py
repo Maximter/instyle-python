@@ -3,8 +3,8 @@ from django.db import models
 import os
 
 class UserManager(models.Manager):
-    def create_user(self, email, name_lastname, username, password):
-        user = self.create(email=email, name_lastname=name_lastname, username=username, password=password)
+    def create_user(self, email, name_lastname, username, password, verificated=False):
+        user = self.create(email=email, name_lastname=name_lastname, username=username, password=password, verificated=verificated)
         UserProfile.objects.create_profile(user)
         return user
     
@@ -58,7 +58,6 @@ class UserProfile(models.Model,):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='profile')
     bio = models.CharField(max_length=300, default='')
     avatar_small = models.ImageField(upload_to=upload_small_avatar, blank=True)
-    avatar_medium = models.ImageField(upload_to=upload_medium_avatar, blank=True)
     avatar_big = models.ImageField(upload_to=upload_big_avatar, blank=True)
     objects = UserProfileManager()
     

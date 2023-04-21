@@ -41,7 +41,7 @@ def save_avatar(user, form):
         user_model = User.objects.get(id=user.id)
         profile = UserProfile.objects.get(user=user_model)
         profile.avatar_big = photo
-        profile.avatar_medium = photo
+        #TODO resize!
         profile.avatar_small = photo
         profile.save()
     else:

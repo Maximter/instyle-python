@@ -21,7 +21,7 @@
             {%if profile.avatar_small%}
             <img src="/static/img/small/avatar/{{user.id}}.jpg" alt="{{user.name_lastname}}" title="{{user.name_lastname}}" class="user-avatar" id="upper-avatar">
             {%else%}
-            <img src="/static/img/small/avatar/standard.jpg" alt="{{user.name_lastname}}" title="{{user.name_lastname}}" class="user-avatar" id="upper-avatar">
+            <img src="/static/img/small/avatar/standard.png" alt="{{user.name_lastname}}" title="{{user.name_lastname}}" class="user-avatar" id="upper-avatar">
             {%endif%}
           </a>
         </div>
@@ -39,7 +39,7 @@
                 {%if profile.avatar_small%}
                 <img src="/static/img/small/avatar/{{user.id}}.jpg" alt="{{user.name_lastname}}" title="{{user.name_lastname}}" class="user-avatar owner-avatar" id="upper-avatar">
                 {%else%}
-                <img src="/static/img/small/avatar/standard.jpg" alt="{{user.name_lastname}}" title="{{user.name_lastname}}" class="user-avatar owner-avatar" id="upper-avatar">
+                <img src="/static/img/small/avatar/standard.png" alt="{{user.name_lastname}}" title="{{user.name_lastname}}" class="user-avatar owner-avatar" id="upper-avatar">
                 {%endif%}
             <p class="owner-username">{{this.user.username}}</p>
               </a>
@@ -179,6 +179,7 @@
     }
 
 
+
       function smallMore(el) {
         edit_comment_val = el.getAttribute('comment');
         id_post_val = el.getAttribute('id_post');
@@ -208,5 +209,33 @@
       }
      
     </script>
+
+{% if messages %}
+{% for message in messages %}
+
+{% if message.tags == 'error' %}
+  <script>
+    Swal.fire({
+      title: 'Ошибка!',
+      text: '{{message}}',
+      icon: 'error',
+      confirmButtonText: 'Повторить попытку'
+    })
+  </script>
+{% endif %}
+
+{% if message.tags == 'success' %}
+  <script>
+    Swal.fire({
+      title: 'Успешно',
+      text: '{{message}}',
+      icon: 'success',
+      confirmButtonText: 'Продолжить'
+    })
+  </script>
+{% endif %}
+
+{% endfor %}
+{% endif %}
   </body>
 </html>

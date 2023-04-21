@@ -1,4 +1,6 @@
 import re
+
+import requests
 from signup.models import Token, User
 from django.contrib.auth.hashers import check_password
 import hashlib
@@ -58,3 +60,19 @@ def send_mail_func(user):
     from_email = 'm-a-x-o-k@yandex.ru'
     recipient_list = [user.email,]
     send_mail(subject, message, from_email, recipient_list)
+
+def get_yandex_token(code):
+    body = {
+        'grant_type': 'authorization_code',
+        'code': code,
+        'client_id': settings.CLIENT_ID,
+        'client_secret': settings.CLIENT_SECRET
+    }
+    response = requests.post('https://oauth.yandex.ru/token', body)
+    return response.json()
+
+def get_yandex_user(data):
+    params = f'jwt_secret={settings.JWT_SECRET}&oauth_token={data["access_token"]}'
+    response = requests.get(f'https://login.yandex.ru/info?{params}')
+    return response.json()
+
