@@ -1,0 +1,19 @@
+{% csrf_token %}
+
+<script>
+
+
+    const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    fetch(`${window.location.origin}/post/get_vk_photos/`, {
+        method: "post",
+        body: window.location.hash,
+        headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'X-CSRFToken': csrftoken,
+        },
+    }).then(response => response)
+        .then(result => { 
+            window.location.href = `${window.location.origin}/settings`
+        })
+</script>

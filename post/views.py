@@ -1,10 +1,18 @@
+from django.http import HttpResponse
 from django.shortcuts import render
+from instyle import settings
 
-from post.service import check_valid_post, save_post_to_db, upload_post
+from post.service import check_valid_post, save_post_to_db, save_posts_from_vk, upload_post
 from signup.models import UserProfile
 from user.service import get_user_by_token
 from django.shortcuts import redirect
 from django.contrib import messages
+from asgiref.sync import async_to_sync, sync_to_async
+
+import requests
+import asyncio
+
+import re
 
 def index(request):
     user = get_user_by_token(request.COOKIES.get('instyle_token'))
@@ -32,4 +40,21 @@ def create(request):
         return redirect('/post')
     messages.error(request, 'Ошибка файла')
     return redirect('/post')
+
+def get_vk_token(request):
+    return render(request, 'post/vk_token.html',)
+
+def get_vk_photos(request):
+    user = get_user_by_token(request.COOKIES.get('instyle_token'))
+    body = str(request.body)
+    start = "access_token="
+    end = "&"
+    start_idx = body.find(start) + len(start)
+    end_idx = body.find(end, start_idx)
+    access_token = body[start_idx:end_idx].strip()
+    response = requests.post(f'https://api.vk.com/method/photos.getAll?access_token={access_token}&v=5.131&count=200')
+    response = response.json()
+    save_posts_from_vk(response, user)
+    messages.success(request, 'Посты будут загружены и опубликованы в ближайшее время')
+    return redirect('/settings')
 

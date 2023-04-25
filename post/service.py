@@ -1,11 +1,13 @@
 import os, errno
-import re
+import re, io
 from django.core.files.storage import FileSystemStorage
 from django.utils.crypto import get_random_string
 from sorl.thumbnail import get_thumbnail
 from django.core.files.move import file_move_safe
 from django.db.models import Case, Value, When
 from django.db.models import Q
+import urllib.request
+from django.core.files import File
 
 
 from post.models import Comment, Like, Post
@@ -177,4 +179,21 @@ def update_hide_comment(post):
         ))
     except Post.DoesNotExist:
         return None
+    return
+
+def save_posts_from_vk(posts, user):
+    for post in reversed(posts['response']['items']):
+        id_post = post['id']
+        for size in post['sizes']:
+            if size['type'] == 'w' or size['type'] == 'q' or size['type'] == 'y':
+                response = urllib.request.urlopen(size['url'])
+                image = response.read()
+                if size['type'] == 'w':
+                    fs = FileSystemStorage(location=f'static/img/big/post/{user.id}')
+                elif size['type'] == 'y':
+                    fs = FileSystemStorage(location=f'static/img/medium/post/{user.id}')
+                else:
+                    fs = FileSystemStorage(location=f'static/img/small/post/{user.id}')
+                fs.save(f'{id_post}.jpg', File(io.BytesIO(image)))
+        Post.objects.create_post(id_post= id_post, comment='', user=user)
     return
