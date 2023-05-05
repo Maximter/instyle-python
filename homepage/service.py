@@ -15,7 +15,6 @@ def get_posts_in_homepage(user, start):
                                 ~Q(visibility='nobody') & \
                                 ~Q(visibility='link') | \
                                 Q(user=user.id)).order_by('-id').prefetch_related('likes')[start:10]
-        print(posts)
     except Post.DoesNotExist:
         return None
     return posts

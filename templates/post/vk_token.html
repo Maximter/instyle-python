@@ -1,5 +1,6 @@
 {% csrf_token %}
 
+<script src='/static/js/sweetalert2.all.min.js'></script>
 <script>
 
 
@@ -12,8 +13,13 @@
         'Content-Type': 'application/json',
         'X-CSRFToken': csrftoken,
         },
-    }).then(response => response)
-        .then(result => { 
-            window.location.href = `${window.location.origin}/settings`
-        })
+    })
+        Swal.fire({
+        title: 'Загрузка фотографий',
+        text: 'Загрузка фотографий была начата. Скоро все фотографии будут отображены на Вашей странице',
+        icon: 'success',
+        confirmButtonText: 'Продолжить'
+      }).then((result) => {
+        window.location.href = '/settings'
+      })
 </script>

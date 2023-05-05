@@ -7,6 +7,7 @@ import hashlib
 from django.core.mail import send_mail
 from django.conf import settings
 import asyncio
+from django.contrib.auth.hashers import make_password
 
 
 def check_user_exist(user):
@@ -76,3 +77,13 @@ def get_yandex_user(data):
     response = requests.get(f'https://login.yandex.ru/info?{params}')
     return response.json()
 
+def valid_password(password):
+    if len(password) < 8:
+        return 'Введен слишком короткий пароль'
+    elif len(password) > 65:
+        return 'Введен слишком длинный пароль'
+    
+def save_new_password(user, password):
+    hash_password = make_password(password)
+    user = User.objects.filter(id=user.id).update(password=hash_password)
+    return

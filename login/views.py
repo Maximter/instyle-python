@@ -9,7 +9,7 @@ import requests
 
 from signup.models import Token, User
 from signup.service import save_yandex_user
-from .service import check_user_exist, get_token, get_yandex_token, get_yandex_user, send_mail_func
+from .service import check_user_exist, get_token, get_yandex_token, get_yandex_user, save_new_password, send_mail_func, valid_password
 
 
 def index(request):
@@ -60,5 +60,25 @@ def confirm(request):
     token.confirmation_key = ''
     token.save()
     User.objects.filter(id=token.user.id).update(verificated=True)
-    messages.success(request, 'Регистрация подтверждена. Теперь Вы можете войти.')
+    messages.success(request, 'Регистрация подтверждена. Теперь Вы можете войти')
+    return redirect('/login')
+
+def forgot_password_page(request):
+    key = request.GET['key']
+    get_object_or_404(Token, confirmation_key=key)
+    return render(request, 'settings/change-password.html', context={'key':key})
+
+def change_password(request):
+    key = request.POST.get('key')
+    password = request.POST.get('password')
+    err_password = valid_password(password)
+    if err_password is not None:
+        messages.error(request, err_password)
+        return redirect(f'/login/change-forgot-password-page/?key={key}')
+    
+    token = get_object_or_404(Token, confirmation_key=key)
+    save_new_password(token.user, password)
+    token.confirmation_key = ''
+    token.save()
+    messages.success(request, 'Пароль был изменён')
     return redirect('/login')

@@ -182,8 +182,11 @@ def update_hide_comment(post):
     return
 
 def save_posts_from_vk(posts, user):
+    all_posts = Post.objects.values_list('id_post',flat=True).filter(user=user.id)
     for post in reversed(posts['response']['items']):
         id_post = post['id']
+        if str(id_post) in all_posts:
+            continue
         for size in post['sizes']:
             if size['type'] == 'w' or size['type'] == 'q' or size['type'] == 'y':
                 response = urllib.request.urlopen(size['url'])

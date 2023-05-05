@@ -1,11 +1,15 @@
 from django.shortcuts import render
+from instyle import settings
 from settings.forms import AvatarForm
 from settings.service import edit_profile_data, save_avatar, update_password
-from signup.models import UserProfile
+from signup.models import Token, UserProfile
+from signup.service import generate_password
 from user.service import get_user_by_token
 from django.http import HttpResponse, QueryDict
 from django.shortcuts import redirect
 from django.contrib import messages
+import hashlib
+from django.core.mail import send_mail
 
 def index(request):
     user = get_user_by_token(request.COOKIES.get('instyle_token'))
@@ -55,4 +59,17 @@ def change_password(request):
         messages.error(request, response['err'])
     else:
         messages.success(request, response['success'])
+    return redirect('/settings')
+
+
+def forgot_password(request):
+    user = get_user_by_token(request.COOKIES.get('instyle_token'))
+    key = hashlib.sha1(generate_password(15).encode('utf-8')).hexdigest()
+    Token.objects.filter(user=user.id).update(confirmation_key=key)
+    subject = 'Изменение пароля'
+    message = f'Для изменения пароля перейдите по ссылке: {settings.BASE_URL}/login/change-forgot-password-page?key={key}'
+    from_email = 'm-a-x-o-k@yandex.ru'
+    recipient_list = [user.email,]
+    send_mail(subject, message, from_email, recipient_list)
+    messages.success(request, 'Ссылка по восстановлению пароля была отправлена на Ваш email')
     return redirect('/settings')
