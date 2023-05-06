@@ -8,6 +8,9 @@ from django.core.mail import send_mail
 from django.conf import settings
 import asyncio
 from django.contrib.auth.hashers import make_password
+import uuid
+from django.db import connection
+
 
 
 def check_user_exist(user):
@@ -85,5 +88,7 @@ def valid_password(password):
     
 def save_new_password(user, password):
     hash_password = make_password(password)
-    user = User.objects.filter(id=user.id).update(password=hash_password)
+    user = User.objects.get(id=user.id)
+    user.password=hash_password
+    user.save()
     return

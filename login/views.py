@@ -6,7 +6,8 @@ from django.shortcuts import redirect
 from django.contrib import messages
 from instyle import settings
 import requests
-
+from settings.views import forgot_password
+import uuid
 from signup.models import Token, User
 from signup.service import save_yandex_user
 from .service import check_user_exist, get_token, get_yandex_token, get_yandex_user, save_new_password, send_mail_func, valid_password
@@ -79,6 +80,20 @@ def change_password(request):
     token = get_object_or_404(Token, confirmation_key=key)
     save_new_password(token.user, password)
     token.confirmation_key = ''
+    token.token = uuid.uuid4()
     token.save()
     messages.success(request, 'Пароль был изменён')
     return redirect('/login')
+
+def login_enter_email(request):
+   
+    return render(request, 'login/email-forgot-password.html')
+
+def login_change_email(request):
+    username = request.POST.get('username')
+    try:
+        user = User.objects.get(username=username)
+    except User.DoesNotExist:
+        messages.error(request, 'Введён неверное имя пользователя')
+        return redirect('/login/login-forgot-password')
+    return forgot_password(request, user)

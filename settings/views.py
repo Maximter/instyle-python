@@ -10,6 +10,7 @@ from django.shortcuts import redirect
 from django.contrib import messages
 import hashlib
 from django.core.mail import send_mail
+from django.template.loader import render_to_string
 
 def index(request):
     user = get_user_by_token(request.COOKIES.get('instyle_token'))
@@ -62,14 +63,18 @@ def change_password(request):
     return redirect('/settings')
 
 
-def forgot_password(request):
-    user = get_user_by_token(request.COOKIES.get('instyle_token'))
+def forgot_password(request, user=None):
+    redirect_url = '/login'
+    if user is None:
+        user = get_user_by_token(request.COOKIES.get('instyle_token'))
+        redirect_url = '/settings'
     key = hashlib.sha1(generate_password(15).encode('utf-8')).hexdigest()
     Token.objects.filter(user=user.id).update(confirmation_key=key)
     subject = 'Изменение пароля'
-    message = f'Для изменения пароля перейдите по ссылке: {settings.BASE_URL}/login/change-forgot-password-page?key={key}'
+    link = f'{settings.BASE_URL}/login/change-forgot-password-page?key={key}'
+    html_message = render_to_string('email/reset_password.html', {'link': link}) 
     from_email = 'm-a-x-o-k@yandex.ru'
     recipient_list = [user.email,]
-    send_mail(subject, message, from_email, recipient_list)
+    send_mail(subject=subject, message='', from_email=from_email, recipient_list=recipient_list, html_message=html_message)
     messages.success(request, 'Ссылка по восстановлению пароля была отправлена на Ваш email')
-    return redirect('/settings')
+    return redirect(redirect_url)

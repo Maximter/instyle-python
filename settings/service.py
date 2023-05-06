@@ -1,6 +1,7 @@
-from signup.models import User, UserProfile
+from signup.models import Token, User, UserProfile
 import re
 from django.contrib.auth.hashers import check_password, make_password
+import uuid
 
 
 def edit_profile_data(user, user_old):
@@ -89,5 +90,5 @@ def update_password(passwords, user):
     if not check_password(passwords['old_pass'], user.password):
         return {'err' : 'Старый пароль введён неверно'}
     hash_password = make_password(passwords['new_pass'])
-    User.objects.filter(id=user.id).update(password=hash_password)
+    user = User.objects.filter(id=user.id).update(password=hash_password)    
     return {'err': '', 'success': 'Пароль был успешно изменён'}

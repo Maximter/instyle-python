@@ -66,7 +66,7 @@ class UserProfile(models.Model,):
 
 
 class Token(models.Model,):
-    token = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+    token = models.CharField(max_length=40, default=uuid.uuid4, unique=True)
     user = models.OneToOneField(
         User,
         on_delete=models.CASCADE,
