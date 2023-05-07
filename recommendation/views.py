@@ -1,6 +1,7 @@
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
 from post.models import Post
+from recommendation.service import get_popular_posts
 from signup.models import User, UserProfile
 from django.forms.models import model_to_dict
 
@@ -9,8 +10,7 @@ from user.service import get_user_by_token
 def index(request):
     user = get_user_by_token(request.COOKIES.get('instyle_token'))
     profile = UserProfile.objects.get(user=user)
-    #TODO redo popular Posts
-    posts = Post.objects.all()[:10]
+    posts = get_popular_posts()
     return render(request, 'recommendation/index.html', context = {'user': user, 'profile':profile, 'posts':posts})
 
 def search(request, username):

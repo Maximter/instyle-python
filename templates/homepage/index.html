@@ -30,13 +30,15 @@
 
     <div id="particles-js">
       <section class="main-section" id="main-section">
-      
+      {%if recommendation%}
+      <h2 class="name-popular" style="display: flex; justify-content: center; margin: 10px;">Интересное</h2>
+      {%endif%}
         <ul>
           {%if posts%}
           {% for this in posts%}
             <li>
               <a href="/user/{{this.user.username}}" class="owner-block">
-                {%if profile.avatar_small%}
+                {%if this.avatar%}
                 <img src="/static/img/small/avatar/{{user.id}}.jpg" alt="{{user.name_lastname}}" title="{{user.name_lastname}}" class="user-avatar owner-avatar" id="upper-avatar">
                 {%else%}
                 <img src="/static/img/small/avatar/standard.png" alt="{{user.name_lastname}}" title="{{user.name_lastname}}" class="user-avatar owner-avatar" id="upper-avatar">
