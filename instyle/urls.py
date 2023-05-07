@@ -10,5 +10,6 @@ urlpatterns = [
     path('user/', include('user.urls')), 
     path('post/', include('post.urls')), 
     path('settings/', include('settings.urls')), 
+    path('recommendation/', include('recommendation.urls')), 
     # path('admin/', admin.site.urls),
 ]

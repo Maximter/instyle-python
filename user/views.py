@@ -23,16 +23,19 @@ def user_page(request, username):
         user.is_follower = is_follower(user, owner)
         posts = get_posts_for_other(user, owner)
     owner.followers = get_followers(owner)
+    
     owner.followings = get_followings(owner)
     owner.count_post = len(posts)
     owner.count_followers = len(owner.followers)
     owner.count_followings = len(owner.followings)
+    owner_profile = UserProfile.objects.get(user=owner.id)
     
     context = {
         'user': user,
         'owner': owner,
+        'owner_profile': owner_profile,
         'posts': posts,
-        'profile':profile
+        'profile':profile,
     }
     return render(request, 'user/index.html', context)
 

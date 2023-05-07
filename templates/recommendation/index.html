@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <title>Instyle</title>
+    <link rel="stylesheet" href="{% static "css/recommendation.css" %}" />
+    <link rel="shortcut icon" type="image/x-icon" href="{% static "img/system/title-logo.png" %}" />
+  </head>
+  <body>
+    <header>
+      <section>
+        <a href="/"><p class="logo-name">Instyle</p></a>
+        <div class="header-icons">
+          <a href="/"><img src="{% static 'img/system/home-empty.svg' %}" alt="Главная страница" title="Главная страница"></img></a>
+          <a href="/chat"><img src="{% static 'img/system/chat-empty.svg' %}" alt="Мессенджер" title="Мессенджер"></img></a>
+          <a href="/post"><img src="{% static 'img/system/add-empty.svg' %}" alt="Добавить фотографию" title="Добавить фотографию"></img></a>
+          <a href="/recommendation"><img src="{% static 'img/system/compass-fill.svg' %}" alt="Рекомендуемое" title="Рекомендуемое"></img></a>
+          <a href="/notification"><img src="{% static 'img/system/notification-empty.svg' %}" alt="Уведомления" title="Уведомления"></img></a>
+          <a href="/user/{{user.username}}">
+            {%if profile.avatar_small%}
+            <img src="/static/img/small/avatar/{{user.id}}.jpg" alt="{{user.name_lastname}}" title="{{user.name_lastname}}" class="user-avatar" id="upper-avatar">
+            {%else%}
+            <img src="/static/img/small/avatar/standard.png" alt="{{user.name_lastname}}" title="{{user.name_lastname}}" class="user-avatar" id="upper-avatar">
+            {%endif%}
+          </a>
+        </div>
+      </section>
+    </header>
+
+    <section class="find-section">
+      <h2>Поиск</h2>
+      <input type="text" placeholder="Введите никнейм пользователя" class="input-find" id="searchInput">
+        <a href="/user/{{user.username}}" class="div-found-user" style="display: none;" id="divUser">
+          <img src="#" class="found-avatar" id="imgUser">
+          <p class="found-user-username" id="usernameUser"></p>
+        </a>
+    </section>
+
+    <section class="main-section" id="main-section">
+      <h2 class="name-popular">Популярное</h2>
+      <ul>
+        {%for this in posts%}
+          <li>
+            <a href="/post/{{this.id_post}}">
+                {%if this.mp4%}
+                  <video class="post-pic" style="object-fit: cover;">
+                    <source src="static/img/video/{{this.user.id}}/{{this.id_post}}.mp4" type='video/mp4;'>
+                  </video>
+                {%else%}
+                  <img src="/static/img/small/post/{{this.user.id}}/{{this.id_post}}.jpg" class="post-pic">
+                {%endif%}
+            </a>
+          </li>
+         {%endfor%}
+      </ul>
+    </section>
+
+
+    <script src="//code.jquery.com/jquery-2.0.2.min.js"></script>
+    <script>
+      $("#searchInput").on('input', function() {
+        const searchInput = document.getElementById('searchInput');
+        const divUser = document.getElementById('divUser');
+        const imgUser = document.getElementById('imgUser');
+        const usernameUser = document.getElementById('usernameUser');
+
+        divUser.style = "display: none;";
+        if (searchInput.value.length > 1 && searchInput.value.length <= 20) {
+          fetch(`${window.location.origin}/recommendation/find/${searchInput.value}`, {
+            method: "get",
+            headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json'
+            },
+          })
+          .then(response => response.json())
+          .then(result => {
+            result = result.user
+            if (result == undefined) return
+            divUser.style = "display: flex;";
+            divUser.href = `/user/${result.username}`;
+            if (result.avatar) imgUser.src = `/static/img/small/avatar/${result.id}.jpg`;
+            else imgUser.src = `/static/img/small/avatar/standard.png`;
+            usernameUser.textContent = result.username;
+          })
+        }
+      });
+    </script>
+  </body>
+</html>

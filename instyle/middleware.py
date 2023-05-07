@@ -12,7 +12,6 @@ def simple_middleware(get_response):
                 url == '/login/confirm/' or url == '/login/yandex/' or\
                 url == '/login/change-forgot-password-page/' or url == '/login/change-password/' or\
                 url == '/login/login-forgot-password/' or url == '/login/login-change-password/':
-            print(url == '/login/')
             return get_response(request)
         if request.method == 'GET' and re.match(url_post, url):
             return get_response(request)
