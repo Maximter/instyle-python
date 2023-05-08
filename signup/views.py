@@ -12,6 +12,7 @@ def index(request):
     response.delete_cookie('instyle_token')
     return response
 
+
 @csrf_protect
 def create(request):
     user: User = {
@@ -23,5 +24,6 @@ def create(request):
     err_valid_user = valid_user(user)
     if err_valid_user:
         return render(request, 'signup/index.html', context={'err': err_valid_user})
-    else: create_user(user)
+    else:
+        create_user(user)
     return render(request, 'signup/index.html', context={'success': True})

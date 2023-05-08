@@ -4,6 +4,7 @@ from django.shortcuts import get_object_or_404, render
 from signup.models import UserProfile
 from .service import follow_db, get_followers, get_followings, get_posts, get_posts_for_other, get_user_by_token, get_owner, is_follower
 
+
 def index(request):
     response = HttpResponseRedirect('/')
     return response
@@ -15,7 +16,7 @@ def user_page(request, username):
     owner = get_owner(username)
     if owner is None:
         return render(request, 'error/404.html')
-    
+
     user.owner = user.id == owner.id
     if user.owner:
         posts = get_posts(owner)
@@ -23,19 +24,18 @@ def user_page(request, username):
         user.is_follower = is_follower(user, owner)
         posts = get_posts_for_other(user, owner)
     owner.followers = get_followers(owner)
-    
     owner.followings = get_followings(owner)
     owner.count_post = len(posts)
     owner.count_followers = len(owner.followers)
     owner.count_followings = len(owner.followings)
     owner_profile = UserProfile.objects.get(user=owner.id)
-    
+
     context = {
         'user': user,
         'owner': owner,
         'owner_profile': owner_profile,
         'posts': posts,
-        'profile':profile,
+        'profile': profile,
     }
     return render(request, 'user/index.html', context)
 

@@ -3,7 +3,7 @@ from django.urls import path
 from post import views_post_page
 from . import views
 
-urlpatterns = [ 
+urlpatterns = [
     path('', views.index),
     path('create/', views.create),
     path('get_vk_token/', views.get_vk_token),
@@ -19,4 +19,3 @@ urlpatterns = [
     path('delete-comment/<str:id_interaction>/', views_post_page.delete_comment),
     path('<str:id_post>/', views_post_page.post_page),
 ]
- 

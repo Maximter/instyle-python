@@ -5,18 +5,25 @@ from settings.service import edit_profile_data, save_avatar, update_password
 from signup.models import Token, UserProfile
 from signup.service import generate_password
 from user.service import get_user_by_token
-from django.http import HttpResponse, QueryDict
+from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.contrib import messages
 import hashlib
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
 
+
 def index(request):
     user = get_user_by_token(request.COOKIES.get('instyle_token'))
     profile = UserProfile.objects.get(user=user)
     form = AvatarForm()
-    return render(request, 'settings/index.html', context = {'user': user, 'form': form, 'profile':profile,})
+    context = {
+        'user': user,
+        'form': form,
+        'profile': profile
+    }
+    return render(request, 'settings/index.html', context)
+
 
 def edit_profile(request):
     user_old = get_user_by_token(request.COOKIES.get('instyle_token'))
@@ -33,6 +40,7 @@ def edit_profile(request):
         messages.success(request, response['success'])
     return redirect('/settings')
 
+
 def change_avatar(request):
     user = get_user_by_token(request.COOKIES.get('instyle_token'))
     form = AvatarForm(request.POST, request.FILES)
@@ -43,10 +51,12 @@ def change_avatar(request):
         messages.success(request, response['success'])
     return redirect('/settings')
 
+
 def delete_user(request):
     user = get_user_by_token(request.COOKIES.get('instyle_token'))
     user.delete()
     return HttpResponse()
+
 
 def change_password(request):
     user = get_user_by_token(request.COOKIES.get('instyle_token'))
@@ -72,9 +82,9 @@ def forgot_password(request, user=None):
     Token.objects.filter(user=user.id).update(confirmation_key=key)
     subject = 'Изменение пароля'
     link = f'{settings.BASE_URL}/login/change-forgot-password-page?key={key}'
-    html_message = render_to_string('email/reset_password.html', {'link': link}) 
+    html_message = render_to_string('email/reset_password.html', {'link': link})
     from_email = 'm-a-x-o-k@yandex.ru'
-    recipient_list = [user.email,]
+    recipient_list = [user.email]
     send_mail(subject=subject, message='', from_email=from_email, recipient_list=recipient_list, html_message=html_message)
     messages.success(request, 'Ссылка по восстановлению пароля была отправлена на Ваш email')
     return redirect(redirect_url)

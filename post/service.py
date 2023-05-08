@@ -1,16 +1,16 @@
-import os, errno
-import re, io
+import os
+import errno
+import re
+import io
+import urllib.request
 from django.core.files.storage import FileSystemStorage
 from django.utils.crypto import get_random_string
 from sorl.thumbnail import get_thumbnail
 from django.core.files.move import file_move_safe
 from django.db.models import Case, Value, When
-from django.db.models import Q
-import urllib.request
 from django.core.files import File
-
-
 from post.models import Comment, Like, Post
+
 
 def check_valid_post(file, comment):
     if file is None:
@@ -18,7 +18,7 @@ def check_valid_post(file, comment):
             'valid': False,
             'err': 'Файл не был загружен',
         }
-    
+
     filename, file_extension = os.path.splitext(file.name)
     match = re.match('\.(jpg|JPG|jpeg|JPEG|png|PNG|mp4)$', file_extension)
     if not match:
@@ -42,6 +42,7 @@ def check_valid_post(file, comment):
             'err': '',
         }
 
+
 def upload_in_other_qualities(id_post, id_user):
     medium_file = get_thumbnail(f'static/img/big/post/{id_user}/{id_post}.jpg', '1200', quality=99, format='JPEG')
     small_file = get_thumbnail(f'static/img/big/post/{id_user}/{id_post}.jpg', '500', quality=99, format='JPEG')
@@ -61,6 +62,7 @@ def upload_in_other_qualities(id_post, id_user):
     file_move_safe(small_file.name, f'static/img/small/post/{id_user}/{id_post}.jpg')
     return
 
+
 def upload_post(file, user):
     id_post = get_random_string(length=12)
     filename, file_extension = os.path.splitext(file.name)
@@ -74,9 +76,11 @@ def upload_post(file, user):
         upload_in_other_qualities(id_post, user.id)
     return id_post
 
+
 def save_post_to_db(id_post, comment, user):
-    Post.objects.create_post(id_post= id_post, comment=comment, user=user)
+    Post.objects.create_post(id_post=id_post, comment=comment, user=user)
     return
+
 
 def save_like(user, id_post):
     model_post = get_model_post(id_post)
@@ -87,6 +91,7 @@ def save_like(user, id_post):
         Like.objects.create_post(user=user, post=model_post)
     return
 
+
 def delete_post_from_db(user, id_post):
     model_post = get_model_post(id_post)
     if user.id != model_post.user.id:
@@ -94,8 +99,10 @@ def delete_post_from_db(user, id_post):
     model_post.delete()
     return
 
+
 def update_post_comment_db(post, comment):
     return Post.objects.filter(id=post.id).update(comment=comment)
+
 
 def get_post_interaction(post):
     try:
@@ -108,21 +115,25 @@ def get_post_interaction(post):
     except Like.DoesNotExist:
         return None
 
+
 def get_post_interaction_by_id(id_interaction):
     try:
         return Comment.objects.get(id=id_interaction)
     except Comment.DoesNotExist:
         return None
 
+
 def edit_comment_db(interaction, comment):
     return Comment.objects.filter(id=interaction.id).update(comment_text=str(comment))
 
+
 def get_user_like(user, post):
     try:
-        like = Like.objects.get(user=user.id, post=post.id)
+        Like.objects.get(user=user.id, post=post.id)
         return True
     except Like.DoesNotExist:
         return False
+
 
 def get_model_post(id_post):
     try:
@@ -131,14 +142,11 @@ def get_model_post(id_post):
         return None
     return model_post
 
+
 def send_comment_db(user, post, comment):
-    try:
-        Comment.objects.create_post(user= user, post=post, comment_text=comment)
-    except:
-        print('Send comment Error')
-        return None
-    
+    Comment.objects.create_post(user=user, post=post, comment_text=comment)
     return
+
 
 def delete_comment_from_db(user, id_interaction):
     try:
@@ -148,12 +156,14 @@ def delete_comment_from_db(user, id_interaction):
 
     if user.id != comment[0].user.id and comment[0].post.user.id != user.id:
         return None
-    
+
     comment.delete()
     return
 
+
 def edit_visibility_db(post, visibility):
     return Post.objects.filter(id=post.id).update(visibility=str(visibility))
+
 
 def update_hide_like(post):
     try:
@@ -168,6 +178,7 @@ def update_hide_like(post):
         return None
     return
 
+
 def update_hide_comment(post):
     try:
         model_post = Post.objects.filter(id=post.id,)
@@ -181,8 +192,9 @@ def update_hide_comment(post):
         return None
     return
 
+
 def save_posts_from_vk(posts, user):
-    all_posts = Post.objects.values_list('id_post',flat=True).filter(user=user.id)
+    all_posts = Post.objects.values_list('id_post', flat=True).filter(user=user.id)
     for post in reversed(posts['response']['items']):
         id_post = post['id']
         if str(id_post) in all_posts:
@@ -198,5 +210,5 @@ def save_posts_from_vk(posts, user):
                 else:
                     fs = FileSystemStorage(location=f'static/img/small/post/{user.id}')
                 fs.save(f'{id_post}.jpg', File(io.BytesIO(image)))
-        Post.objects.create_post(id_post= id_post, comment='', user=user)
+        Post.objects.create_post(id_post=id_post, comment='', user=user)
     return

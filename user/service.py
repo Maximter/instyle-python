@@ -1,8 +1,8 @@
 from post.models import Post
 from signup.models import Token, User
 from django.db.models import Q
-
 from user.models import Follow
+
 
 def get_user_by_token(token):
     try:
@@ -11,12 +11,14 @@ def get_user_by_token(token):
         return None
     return token_model.user
 
+
 def get_owner(username):
     try:
         owner = User.objects.get(username=username)
     except User.DoesNotExist:
         return None
     return owner
+
 
 def get_posts_for_other(user, owner):
     try:
@@ -27,6 +29,7 @@ def get_posts_for_other(user, owner):
     except User.DoesNotExist:
         return None
     return posts
+
 
 def follow_db(follower, following):
     try:
