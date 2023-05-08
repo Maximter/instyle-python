@@ -6,6 +6,8 @@
     <title>Instyle</title>
     <link rel="stylesheet" href="{% static "css/recommendation.css" %}" />
     <link rel="shortcut icon" type="image/x-icon" href="{% static "img/system/title-logo.png" %}" />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lazyload@2.0.0-rc.2/lazyload.js"></script>
   </head>
   <body>
     <header>
@@ -48,7 +50,7 @@
                     <source src="static/img/video/{{this.user.id}}/{{this.id_post}}.mp4" type='video/mp4;'>
                   </video>
                 {%else%}
-                  <img src="/static/img/small/post/{{this.user.id}}/{{this.id_post}}.jpg" class="post-pic">
+                  <img data-src="/static/img/small/post/{{this.user.id}}/{{this.id_post}}.jpg" src="/static/img/small/pattern/lazy.jpg" class="lazyload post-pic">
                 {%endif%}
             </a>
           </li>
@@ -57,7 +59,9 @@
     </section>
 
 
-    <script src="//code.jquery.com/jquery-2.0.2.min.js"></script>
+    <script>
+      lazyload();
+    </script>
     <script>
       $("#searchInput").on('input', function() {
         const searchInput = document.getElementById('searchInput');
