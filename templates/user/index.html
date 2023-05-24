@@ -75,9 +75,17 @@
     </section>
 
     <section class="main-section" id="main-section">
+      {%if user.owner%}
+        <div class="chose-block">
+          <div style="border-bottom: 1px #000 solid;" onclick="show_post()" id="button-post"><img src="{% static 'img/system/photo.svg' %}"> Записи</div>
+          <div style="border-bottom: 0px #000 solid;" onclick="show_archive()" id="button-archive"><img src="{% static 'img/system/archive.svg' %}"> Архивированное</div>
+          <div style="border-bottom: 0px #000 solid;" onclick="show_favorite()" id="button-favorite"><img src="{% static 'img/system/favorite.svg' %}" > Избранное</div>
+        </div>
+      {%endif%}
+
       <ul>
         {%for this in posts%}
-          <li>
+          <li class="post">
             <a href="/post/{{this.id_post}}">
                 {%if this.mp4%}
                   <video class="post-pic" style="object-fit: cover;">
@@ -89,6 +97,34 @@
             </a>
           </li>
          {%endfor%}
+
+         {%for this in archive%}
+          <li class="archive" style="display: none;">
+            <a href="/post/{{this.id_post}}">
+                {%if this.mp4%}
+                  <video class="post-pic" style="object-fit: cover;">
+                    <source src="static/img/video/{{this.user.id}}/{{this.id_post}}.mp4" type='video/mp4;'>
+                  </video>
+                {%else%}
+                  <img data-src="/static/img/small/post/{{this.user.id}}/{{this.id_post}}.jpg" src="/static/img/small/pattern/lazy.jpg" class="lazyload post-pic">
+                {%endif%}
+            </a>
+          </li>
+         {%endfor%}
+
+         {%for this in favorite%}
+          <li class="favorite" style="display: none;">
+            <a href="/post/{{this.post.id_post}}">
+                {%if this.mp4%}
+                  <video class="post-pic" style="object-fit: cover;">
+                    <source src="static/img/video/{{this.post.user.id}}/{{this.post.id_post}}.mp4" type='video/mp4;'>
+                  </video>
+                {%else%}
+                  <img data-src="/static/img/small/post/{{this.post.user.id}}/{{this.post.id_post}}.jpg" src="/static/img/small/pattern/lazy.jpg" class="lazyload post-pic">
+                {%endif%}
+            </a>
+          </li>
+         {%endfor%}
       </ul>
     </section>
 
@@ -96,6 +132,60 @@
   <script>
     lazyload();
   </script>
+
+<script>
+  let button_post = document.getElementById('button-post')
+  let button_archive = document.getElementById('button-archive')
+  let button_favorite = document.getElementById('button-favorite')
+  let all_post = document.querySelectorAll('.post')
+  let all_archive = document.querySelectorAll('.archive')
+  let all_favorite = document.querySelectorAll('.favorite')
+
+  function show_post() {
+    button_post.style = 'border-bottom: 1px #000 solid;'
+    button_archive.style = 'border-bottom: 0px #000 solid;'
+    button_favorite.style = 'border-bottom: 0px #000 solid;'
+    all_post.forEach(element => {
+      element.style = 'display: unset;'
+    });
+    all_archive.forEach(element => {
+      element.style = 'display: none;'
+    });
+    all_favorite.forEach(element => {
+      element.style = 'display: none;'
+    });
+  }
+
+  function show_archive() {
+    button_post.style = 'border-bottom: 0px #000 solid;'
+    button_archive.style = 'border-bottom: 1px #000 solid;'
+    button_favorite.style = 'border-bottom: 0px #000 solid;'
+    all_post.forEach(element => {
+      element.style = 'display: none;'
+    });
+    all_archive.forEach(element => {
+      element.style = 'display: unset;'
+    });
+    all_favorite.forEach(element => {
+      element.style = 'display: none;'
+    });
+  }
+
+  function show_favorite() {
+    button_post.style = 'border-bottom: 0px #000 solid;'
+    button_archive.style = 'border-bottom: 0px #000 solid;'
+    button_favorite.style = 'border-bottom: 1px #000 solid;'
+    all_post.forEach(element => {
+      element.style = 'display: none;'
+    });
+    all_archive.forEach(element => {
+      element.style = 'display: none;'
+    });
+    all_favorite.forEach(element => {
+      element.style = 'display: unset;'
+    });
+  }
+</script>
     
   <script src="{% static 'js/sweetalert2.all.min.js' %}"></script>
   {%if user.owner%}

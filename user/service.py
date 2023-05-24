@@ -1,5 +1,5 @@
 from notification.service import delete_notification, send_notification
-from post.models import Post
+from post.models import Favorite, Post
 from signup.models import Token, User
 from django.db.models import Q
 from user.models import Follow
@@ -69,7 +69,21 @@ def get_followings(user):
 
 def get_posts(user):
     try:
-        posts = Post.objects.filter(user=user).order_by('-id')
+        posts = Post.objects.filter(~Q(visibility='nobody'), user=user,).order_by('-id')
     except Post.DoesNotExist:
+        return None
+    return posts
+
+def get_archive(user):
+    try:
+        posts = Post.objects.filter(visibility='nobody', user=user,).order_by('-id')
+    except Post.DoesNotExist:
+        return None
+    return posts
+
+def get_favorite(user):
+    try:
+        posts = Favorite.objects.filter(user=user,).order_by('-id')
+    except Favorite.DoesNotExist:
         return None
     return posts

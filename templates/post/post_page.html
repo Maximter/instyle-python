@@ -528,9 +528,39 @@
     </script>
 
     <script>
+      function favorite (id_post) {
+      const hide_like = '{{favorite}}'
+      let word_like = 'добавлена в избранное'
+      if (hide_like == 'True') word_like = 'удалена из избранного '
+      const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        fetch(`${window.location.origin}/post/add-favorite/${id_post}/`, {
+         method: "post",
+         headers: {
+           'Accept': 'application/json',
+           'Content-Type': 'application/json',
+           'X-CSRFToken': csrftoken,
+         },
+       }).then(response => response)
+         .then(result => { 
+           Swal.fire({
+             position: 'top',
+             icon: 'success',
+             title: `Запись была ${word_like}`,
+             showConfirmButton: false,
+             timer: 1000
+           }).then(() => {
+             window.location.href = `${window.location.origin}/post/${id_post}/`
+           })
+         })
+      }
+    </script>
+
+    <script>
     function more() {
       const hide_like = '{{post.hide_like}}'
       const hide_comment = '{{post.hide_comment}}'
+      let in_favorite = '{{favorite}}'
+      in_favorite == 'True' ? in_favorite = 'Удалить из избранного' : in_favorite = 'Добавить в избранное'
       let word_like = 'Скрывать'
       let word_comment = 'Скрывать'
       if (hide_like == 'True') word_like = 'Показывать'
@@ -542,6 +572,7 @@
         html:`   <div class="more-menu">
       <p style="color: red;" onclick="deletePost('{{post.id_post}}', '{{user.username}}')">Удалить</p>
       <p onclick="copy()">Скопировать ссылку на пост</p>
+      <p onclick="favorite('{{post.id_post}}')">${in_favorite}</p>
       <p onclick="edit_comment('{{post.comment|stringformat:"i"}}', '{{post.id_post}}')">Редактировать описание</p>
       <p onclick="hide_like('{{post.id_post}}')">${word_like} число отметок "Нравится"</p>
       <p onclick="hide_comment('{{post.id_post}}')">${word_comment} комментарии</p>
@@ -555,12 +586,15 @@
     {%else%}
     <script>
       function more() {
+      let in_favorite = '{{post.favorite}}'
+      in_favorite == 'True' ? in_favorite = 'Добавить в избранное' : in_favorite = 'Удалить из избранного'
         Swal.fire({
           position: 'top',
           showCancelButton: false,
           showConfirmButton: false,
           html:`   <div class="more-menu">
         <p onclick="copy()">Скопировать ссылку на пост</p>
+        <p onclick="favorite()">${in_favorite}</p>
         <p onclick="close_menu()" style="border-bottom: none;">Отмена</p>
       </div>`, 
           

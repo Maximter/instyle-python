@@ -2,7 +2,7 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 
 from signup.models import UserProfile
-from .service import follow_db, get_followers, get_followings, get_posts, get_posts_for_other, get_user_by_token, get_owner, is_follower
+from .service import follow_db, get_archive, get_favorite, get_followers, get_followings, get_posts, get_posts_for_other, get_user_by_token, get_owner, is_follower
 
 
 def index(request):
@@ -20,6 +20,8 @@ def user_page(request, username):
     user.owner = user.id == owner.id
     if user.owner:
         posts = get_posts(owner)
+        archive = get_archive(owner)
+        favorite = get_favorite(owner)
     else:
         user.is_follower = is_follower(user, owner)
         posts = get_posts_for_other(user, owner)
@@ -36,6 +38,8 @@ def user_page(request, username):
         'owner_profile': owner_profile,
         'posts': posts,
         'profile': profile,
+        'archive': archive,
+        'favorite': favorite
     }
     return render(request, 'user/index.html', context)
 

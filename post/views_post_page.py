@@ -1,7 +1,8 @@
 import json
 from django.http import HttpResponse
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, render
 from notification.service import send_notification
+from post.models import Favorite
 
 from post.service import delete_comment_from_db, delete_post_from_db, edit_comment_db, edit_visibility_db, get_model_post, get_post_interaction, get_post_interaction_by_id, get_user_like, save_like, send_comment_db, update_hide_comment, update_hide_like, update_post_comment_db
 from signup.models import UserProfile
@@ -26,9 +27,14 @@ def post_page(request, id_post):
     elif not model_post.visibility == 'all':
         return render(request, 'error/404.html')
     owner_profile = UserProfile.objects.get(user=model_post.user.id)
+    try:
+        Favorite.objects.get(user=user, post=model_post)
+        favorite = True
+    except Favorite.DoesNotExist:
+        favorite = False
     # TODO если видео, то mp4 = True
     # print(os.path.exists(f'{settings.BASE_DIR}/static/img/video/{user.id}/{model_post.id}.mp4'))
-    return render(request, 'post/post_page.html', context={'user': user, 'post': model_post, 'profile': profile, 'owner_profile': owner_profile})
+    return render(request, 'post/post_page.html', context={'user': user, 'post': model_post, 'profile': profile, 'owner_profile': owner_profile, 'favorite':favorite})
 
 
 def like_post(request, id_post):
@@ -67,6 +73,18 @@ def send_comment(request, id_post):
     send_comment_db(user, model_post, comment)
     return HttpResponse()
 
+
+def add_favorite(request, id_post):
+    user = get_user_by_token(request.COOKIES.get('instyle_token'))
+    model_post = get_model_post(id_post)
+    favorite, created = Favorite.objects.get_or_create(user=user, post=model_post)
+
+    if created:
+        favorite.save()
+    else:
+        favorite.delete()
+
+    return HttpResponse()
 
 def edit_comment(request, id_interaction):
     comment = get_comment(request)

@@ -58,3 +58,13 @@ class Like(models.Model):
 
     class Meta:
         db_table = 'like'
+
+
+class Favorite(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    post = models.ForeignKey(Post, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'favorite'
+        unique_together = ['user', 'post']
