@@ -1,3 +1,4 @@
+from notification.service import delete_notification, send_notification
 from post.models import Post
 from signup.models import Token, User
 from django.db.models import Q
@@ -37,8 +38,10 @@ def follow_db(follower, following):
         if len(realtion) == 0:
             raise Follow.DoesNotExist
         realtion.delete()
+        delete_notification(following, follower, 'follow')
     except Follow.DoesNotExist:
         Follow.objects.create_post(follower=follower, following=following,)
+        send_notification(following, follower, 'follow')
     return realtion
 
 

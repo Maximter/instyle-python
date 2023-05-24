@@ -8,4 +8,5 @@ urlpatterns = [
     path('post/', include('post.urls')),
     path('settings/', include('settings.urls')),
     path('recommendation/', include('recommendation.urls')),
+    path('notification/', include('notification.urls')),
 ]

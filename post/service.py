@@ -9,6 +9,7 @@ from sorl.thumbnail import get_thumbnail
 from django.core.files.move import file_move_safe
 from django.db.models import Case, Value, When
 from django.core.files import File
+from notification.service import delete_notification, send_notification
 from post.models import Comment, Like, Post
 
 
@@ -87,8 +88,11 @@ def save_like(user, id_post):
     try:
         like = Like.objects.get(post=model_post.id, user=user.id)
         like.delete()
+        delete_notification(model_post.user, user, 'like', model_post)
     except Like.DoesNotExist:
         Like.objects.create_post(user=user, post=model_post)
+        if model_post.user != user:
+            send_notification(model_post.user, user, 'like', model_post)
     return
 
 
@@ -149,14 +153,12 @@ def send_comment_db(user, post, comment):
 
 
 def delete_comment_from_db(user, id_interaction):
-    try:
-        comment = Comment.objects.filter(id=id_interaction)
-    except Post.DoesNotExist:
-        return None
+    comment = Comment.objects.filter(id=id_interaction)
 
     if user.id != comment[0].user.id and comment[0].post.user.id != user.id:
         return None
 
+    delete_notification(comment[0].post.user, user, 'comment', comment[0].post)
     comment.delete()
     return
 

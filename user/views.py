@@ -53,6 +53,5 @@ def follow(request, username):
 def unfollow(request, username):
     owner = get_user_by_token(request.COOKIES.get('instyle_token'))
     user = get_owner(username)
-
     follow_db(user, owner)
     return HttpResponseRedirect(f'/user/{owner.username}')
