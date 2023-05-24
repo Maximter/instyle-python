@@ -31,10 +31,26 @@
     <section class="main-section">
       <h1>Уведомления</h1>
 
+      <div class="chose-block">
+        <div style="border-bottom: 1px #000 solid;" onclick="show_like()" id="button-like"><img src="{% static 'img/system/notification-empty.svg' %}"> Нравится</div>
+        <div style="border-bottom: 0px #000 solid;" onclick="show_comment()" id="button-comment"><img src="{% static 'img/system/comment.svg' %}"> Комментарии</div>
+        <div style="border-bottom: 0px #000 solid;" onclick="show_follow()" id="button-follow"><img src="{% static 'img/system/follow.svg' %}" > Подписки</div>
+        <!-- <div>Request</div> -->
+      </div>
+
       <ul class="settings-block">  
         {%if notifications%}
         {%for this in notifications%}
-          <li>
+
+        {%if this.notification_type == 'follow'%}
+          <li class="follow" style="display: none;" >
+        {%endif%}
+        {%if this.notification_type == 'comment'%}
+          <li class="comment" style="display: none;">
+        {%endif%}
+        {%if this.notification_type == 'like'%}
+          <li class="like">
+        {%endif%}
             <a href="/user/{{this.sender.username}}" class="owner-block">
               {%if this.avatar%}
                 <img src="/static/img/small/avatar/{{user.id}}.jpg" alt="{{user.name_lastname}}" title="{{user.name_lastname}}" class="notif-avatar">
@@ -73,7 +89,58 @@
 
     </section>
 
-    <script src="/socket.io/socket.io.js"></script>
-  <script src="../js/sockets.js"></script>
+    <script>
+      let button_like = document.getElementById('button-like')
+      let button_comment = document.getElementById('button-comment')
+      let button_follow = document.getElementById('button-follow')
+      let all_like = document.querySelectorAll('.like')
+      let all_comment = document.querySelectorAll('.comment')
+      let all_follow = document.querySelectorAll('.follow')
+
+      function show_like() {
+        button_like.style = 'border-bottom: 1px #000 solid;'
+        button_follow.style = 'border-bottom: 0px #000 solid;'
+        button_comment.style = 'border-bottom: 0px #000 solid;'
+        all_like.forEach(element => {
+          element.style = 'display: flex;'
+        });
+        all_comment.forEach(element => {
+          element.style = 'display: none;'
+        });
+        all_follow.forEach(element => {
+          element.style = 'display: none;'
+        });
+      }
+
+      function show_comment() {
+        button_like.style = 'border-bottom: 0px #000 solid;'
+        button_follow.style = 'border-bottom: 0px #000 solid;'
+        button_comment.style = 'border-bottom: 1px #000 solid;'
+        all_like.forEach(element => {
+          element.style = 'display: none;'
+        });
+        all_comment.forEach(element => {
+          element.style = 'display: flex;'
+        });
+        all_follow.forEach(element => {
+          element.style = 'display: none;'
+        });
+      }
+
+      function show_follow() {
+        button_like.style = 'border-bottom: 0px #000 solid;'
+        button_follow.style = 'border-bottom: 1px #000 solid;'
+        button_comment.style = 'border-bottom: 0px #000 solid;'
+        all_like.forEach(element => {
+          element.style = 'display: none;'
+        });
+        all_comment.forEach(element => {
+          element.style = 'display: none;'
+        });
+        all_follow.forEach(element => {
+          element.style = 'display: flex;'
+        });
+      }
+    </script>
   </body>
 </html>
