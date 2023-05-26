@@ -19,8 +19,7 @@ def index(request):
 
 def create(request):
     comment = request.POST.get('comment')
-    visibility = request.POST.get('new-visibility')
-    print(visibility)
+    visibility = request.POST.get('visibility')
     if comment is not None:
         comment = comment.strip()
     user = get_user_by_token(request.COOKIES.get('instyle_token'))
@@ -34,7 +33,7 @@ def create(request):
             return redirect('/post')
 
         id_post = upload_post(file, user)
-        save_post_to_db(id_post, comment, user)
+        save_post_to_db(id_post, comment, user, visibility)
         messages.success(request, 'Пост будет опубликован через несколько секунд')
         return redirect('/post')
     messages.error(request, 'Ошибка файла')

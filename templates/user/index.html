@@ -34,7 +34,7 @@
     <section class="profile-section">
       <div class="avatar-main-block">
         {%if owner_profile.avatar_big%}
-          <img src="/static/img/big/avatar/{{owner.id}}.jpg" alt="{{owner.name_lastname}}" title="{{owner.name_lastname}}" class="user-avatar main-avatar" id="upper-avatar">
+          <img src="/static/img/big/avatar/{{owner.id}}.jpg" onclick="open_img()" style="cursor: pointer;" alt="{{owner.name_lastname}}" title="{{owner.name_lastname}}" class="user-avatar main-avatar" id="upper-avatar">
         {%else%}
           <img src="/static/img/big/avatar/standard.png" alt="{{owner.name_lastname}}" title="{{owner.name_lastname}}" class="user-avatar main-avatar" id="upper-avatar">
         {%endif%}
@@ -132,6 +132,16 @@
   <script>
     lazyload();
   </script>
+
+<script>
+  function open_img() {
+    Swal.fire({
+          position: 'top',
+          html: `<img src="/static/img/big/avatar/{{owner.id}}.jpg" class="post-pic">`,
+          showConfirmButton: false,
+        })
+  }
+</script>
 
 <script>
   let button_post = document.getElementById('button-post')

@@ -5,8 +5,8 @@ from signup.models import User
 
 
 class PostManager(models.Manager):
-    def create_post(self, id_post, user, comment):
-        post = self.create(id_post=id_post, user=user, comment=comment)
+    def create_post(self, id_post, user, comment, visibility):
+        post = self.create(id_post=id_post, user=user, comment=comment, visibility=visibility)
         return post
 
 

@@ -78,8 +78,8 @@ def upload_post(file, user):
     return id_post
 
 
-def save_post_to_db(id_post, comment, user):
-    Post.objects.create_post(id_post=id_post, comment=comment, user=user)
+def save_post_to_db(id_post, comment, user, visibility):
+    Post.objects.create_post(id_post=id_post, comment=comment, user=user, visibility=visibility)
     return
 
 

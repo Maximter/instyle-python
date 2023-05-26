@@ -51,7 +51,7 @@
             <source src="{% static 'img/video/{{post.user.id}}/{{post.id_post}}.mp4' %}" type='video/mp4;'>
           </video>
         {%else%}
-          <img src="/static/img/big/post/{{post.user.id}}/{{post.id_post}}.jpg" onclick="open_img()" style="cursor: pointer;" class="post-pic">
+          <img src="/static/img/big/post/{{post.user.id}}/{{post.id_post}}.jpg" onclick="open_img(this)" style="cursor: pointer;" class="post-pic">
         {%endif%}
       </div>
 
@@ -134,12 +134,22 @@
     {% csrf_token %}
 
     <script>
-      function open_img() {
-        Swal.fire({
-              position: 'top',
-              html: `<img src="/static/img/big/post/{{post.user.id}}/{{post.id_post}}.jpg" class="post-pic">`,
-              showConfirmButton: false,
-            })
+      function open_img(el) {
+        
+        if (+el.width > +el.height) {
+          Swal.fire({
+          imageUrl: '/static/img/big/post/{{post.user.id}}/{{post.id_post}}.jpg',
+          width: '70%',
+          showConfirmButton: false,
+        })
+        } else {
+          Swal.fire({
+          imageUrl: '/static/img/big/post/{{post.user.id}}/{{post.id_post}}.jpg',
+          heidth: '90%',
+          showConfirmButton: false,
+        })
+        }
+        
       }
     </script>
 

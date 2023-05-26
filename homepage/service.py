@@ -13,9 +13,10 @@ def get_posts_in_homepage(user, start):
 
     try:
         posts = \
-            Post.objects.filter(Q(user_id__in=followings) &
+            Post.objects.filter(~Q(visibility='nobody') &
+                                ~Q(visibility='link') &
+                                Q(user_id__in=followings) |
                                 ~Q(visibility='nobody') &
-                                ~Q(visibility='link') |
                                 Q(user=user.id)).order_by('-id').prefetch_related('likes')[start:10]
     except Post.DoesNotExist:
         return None
