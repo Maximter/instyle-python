@@ -1,14 +1,29 @@
 from django.http import HttpResponse
 from django.shortcuts import render
-
+import json
+from homepage.views import get_posts
 from post.service import check_valid_post, save_post_to_db, save_posts_from_vk, upload_post
 from signup.models import UserProfile
 from user.service import get_user_by_token
 from django.shortcuts import redirect
 from django.contrib import messages
 from vk_downloads import download
+from django.core import serializers
+from django.db.models import Model
+
+from datetime import datetime
 
 import requests
+
+
+class DateTimeEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, datetime):
+            return obj.isoformat()
+        elif isinstance(obj, Model):
+            return obj.__dict__
+        return super().default(obj)
+
 
 
 def index(request):
@@ -39,6 +54,33 @@ def create(request):
     messages.error(request, 'Ошибка файла')
     return redirect('/post')
 
+
+def get_more(request): 
+    user = get_user_by_token(request.COOKIES.get('instyle_token'))
+    start = request.GET.get('start')
+    posts = get_posts(user, start)
+
+    serialized_posts = []
+    for post in posts:
+        serialized_post = {
+            'id_post': post.id_post,
+            'comment': post.comment,
+            'hide_like': post.hide_like,
+            'avatar': post.avatar,
+            'user_like': post.user_like,
+            'like_count': post.like_count,
+            'user': {
+                'id': post.user.id,
+                'name_lastname': post.user.name_lastname,
+                'username': post.user.username,
+            },
+        }
+        serialized_posts.append(serialized_post)
+
+    json_data = json.dumps(serialized_posts)
+    response = HttpResponse(json_data, content_type='application/json')
+    
+    return response
 
 def get_vk_token(request):
     return render(request, 'post/vk_token.html',)

@@ -33,7 +33,7 @@
       {%if recommendation%}
       <h2 class="name-popular" style="display: flex; justify-content: center; margin: 10px;">Интересное</h2>
       {%endif%}
-        <ul>
+        <ul id="all_posts">
           {%if posts%}
           {% for this in posts%}
             <li>
@@ -81,8 +81,9 @@
     </div>
     </li>
   {%endfor%}
+      </ul>
           <button class="button_more" onclick="window.location='/recommendation'">Смотреть популярные посты</button>
-          <button class="button_more" onclick="load_more()">Смотреть предыдущие посты</button>
+          <button class="button_more" onclick="load_more(this)">Смотреть предыдущие посты</button>
           {%endif%}
     </section>
     </div>
@@ -94,6 +95,81 @@
   <script src="{% static "js/main-page-listener.js" %}"></script>
    <script src="{% static "js/sweetalert2.all.min.js" %}"></script>
    {% csrf_token %}
+    <script>
+      function load_more(el) {
+        el.style = 'display: none;'
+        all_posts = document.getElementById('all_posts')
+        count = all_posts.getElementsByTagName("li").length
+        const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        fetch(`/post/get_more/?start=${count+1}`, {
+         method: "GET",
+         headers: {
+           'Accept': 'application/json',
+           'Content-Type': 'application/json',
+           'X-CSRFToken': csrftoken,
+         },}).then(response => response.json())
+         .then(result => { 
+          if (result.length == 0) {
+            Swal.fire({
+             position: 'top',
+             icon: 'success',
+             title: 'Вы просмотрели все записи',
+             showConfirmButton: false,
+             timer: 1000
+           })
+          } else {
+          el.style = 'display: block;'
+          result.forEach(element => {
+            all_posts.innerHTML += `
+            <li>
+              <a href="/user/${element.user.username}" class="owner-block">
+                ` + (element.avatar ? `
+                <img src="/static/img/small/avatar/${element.user.id}.jpg" alt="${element.user.username}" title="${element.user.name_lastname}" class="user-avatar owner-avatar" id="upper-avatar">
+                ` : `
+                <img src="/static/img/small/avatar/standard.png" alt="${element.user.username}" title="${element.user.name_lastname}" class="user-avatar owner-avatar" id="upper-avatar">
+                `) + `
+            <p class="owner-username">${element.user.username}</p>
+              </a>
+              <a href="/post/${element.id_post}" class="bar">
+                ` + (element.mp4 ? `
+                  <video class="post-pic" controls="controls">
+                    <source src="/static/img/post/postedVid/${element.user.id}/${element.id_post}.mp4" type='video/mp4;'>
+                  </video>
+                  ` : `
+                  <img src="/static/img/medium/post/${element.user.id}/${element.id_post}.jpg" class="post-pic">
+                  `) + `
+              </a>
+              <div class="under-post">
+                ` + (element.user_like ? ` 
+                    <img src="{% static 'img/system/liked.svg' %}" title="Нравится" class="like" onclick="like(this, '${element.id_post}', '${element.hide_like}')">
+                  ` : `
+                    <img src="{% static 'img/system/notification-empty.svg' %}" title="Нравится" class="like" onclick="like(this, '${element.id_post}', '${element.hide_like}')">
+                  `) + `
+
+                ` + (element.hide_like == false ? ` 
+                  <p class="comment-text" style="margin: 0 0 0 10px;"><span style="font-weight: 500; " id="likes_${element.id_post}" likes="${element.like_count}" >Отметок нравится: ${element.like_count}</span></p>
+                ` : `
+                  <p class="comment-text" style="margin: 0 0 0 10px;"><span style="font-weight: 500; " id="likes_${element.id_post}" >Нравится некоторым людям</span></p>
+                `) + `
+              </div> 
+
+
+        <div class="comments">
+          ` + (element.comment ? ` 
+          <p class="comment-text">
+            <a href="/user/${element.user.username}">
+              <span style="font-weight: 500;">${element.user.username}:</span>
+            </a> 
+            ${element.comment}
+          </p>
+          ` : ` `) + `
+    </div>
+    </li>`
+          });}
+          })
+      }
+    </script>
+
     <script>
        edit_comment_val = ''
       id_post_val = ''
@@ -111,16 +187,17 @@
         if (el.src.indexOf('notification') > -1) {
           el.src = "/static/img/system/liked.svg";
 
-          if (hide_like == 'False')
+         
+          if (hide_like == 'False' || hide_like == 'false')
             count.attributes.likes.value = ++count.attributes.likes.value;
         }
         else {
           el.src = "/static/img/system/notification-empty.svg";
-          if (hide_like == 'False')
+          if (hide_like == 'False' || hide_like == 'false')
             count.attributes.likes.value = --count.attributes.likes.value;
           
         }
-        if (hide_like == 'False')
+        if (hide_like == 'False' || hide_like == 'false')
           count.innerHTML = `Отметок нравится: ${count.attributes.likes.value}`;
         
       }

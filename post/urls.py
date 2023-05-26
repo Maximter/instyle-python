@@ -6,6 +6,7 @@ from . import views
 urlpatterns = [
     path('', views.index),
     path('create/', views.create),
+    path('get_more/', views.get_more),
     path('get_vk_token/', views.get_vk_token),
     path('get_vk_photos/', views.get_vk_photos),
     path('like/<str:id_post>/', views_post_page.like_post),
