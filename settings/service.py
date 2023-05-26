@@ -1,6 +1,10 @@
 import re
 from signup.models import User, UserProfile
 from django.contrib.auth.hashers import check_password, make_password
+from django.db.models import Q
+from user.models import CloseFriend, Follow
+from django.core.exceptions import ObjectDoesNotExist
+
 
 
 def edit_profile_data(user, user_old):
@@ -89,3 +93,13 @@ def update_password(passwords, user):
     hash_password = make_password(passwords['new_pass'])
     user = User.objects.filter(id=user.id).update(password=hash_password)
     return {'err': '', 'success': 'Пароль был успешно изменён'}
+
+
+def get_close_friends(user):
+    return CloseFriend.objects.filter(user=user).select_related('friend')
+
+def get_followers_not_close(user):
+    close_friends = CloseFriend.objects.filter(user=user).values_list('friend_id', flat=True)
+    followers = Follow.objects.exclude(follower__in=close_friends).filter(following=user)
+    
+    return followers

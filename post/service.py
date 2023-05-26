@@ -152,13 +152,16 @@ def send_comment_db(user, post, comment):
     return
 
 
-def delete_comment_from_db(user, id_interaction):
-    comment = Comment.objects.filter(id=id_interaction)
-
-    if user.id != comment[0].user.id and comment[0].post.user.id != user.id:
+def delete_comment_from_db(user, id_comment):
+    try:
+        comment = Comment.objects.get(id=id_comment)
+    except Comment.DoesNotExist:
+        raise 
+    
+    if user.id != comment.user.id and comment.post.user.id != user.id:
         return None
 
-    delete_notification(comment[0].post.user, user, 'comment', comment[0].post)
+    delete_notification(comment.post.user, comment.user, 'comment', comment.post)
     comment.delete()
     return
 

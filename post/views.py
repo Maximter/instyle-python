@@ -19,6 +19,8 @@ def index(request):
 
 def create(request):
     comment = request.POST.get('comment')
+    visibility = request.POST.get('new-visibility')
+    print(visibility)
     if comment is not None:
         comment = comment.strip()
     user = get_user_by_token(request.COOKIES.get('instyle_token'))

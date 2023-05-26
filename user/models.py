@@ -23,3 +23,13 @@ class Follow(models.Model,):
 
     class Meta:
         db_table = 'follow'
+
+
+class CloseFriend(models.Model):
+    user = models.ForeignKey(User, related_name='user_close_friends', on_delete=models.CASCADE)
+    friend = models.ForeignKey(User, related_name='friend_close_friends', on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'close_friend'
+        unique_together = ['user', 'friend']

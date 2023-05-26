@@ -11,7 +11,7 @@ def send_notification(recipient, sender, notification_type, post=None):
 
 def delete_notification(recipient, sender, notification_type, post=None):
     if post is None:
-        notification = Notification.objects.get(recipient=recipient, sender=sender, notification_type=notification_type,)
+        notification = Notification.objects.filter(recipient=recipient, sender=sender, notification_type=notification_type,)
     else:
-        notification = Notification.objects.get(recipient=recipient, sender=sender, notification_type=notification_type, post=post)
-    notification.delete()
+        notification = Notification.objects.filter(recipient=recipient, sender=sender, notification_type=notification_type, post=post)
+    notification[0].delete()

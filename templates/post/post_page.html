@@ -51,7 +51,7 @@
             <source src="{% static 'img/video/{{post.user.id}}/{{post.id_post}}.mp4' %}" type='video/mp4;'>
           </video>
         {%else%}
-          <img src="/static/img/big/post/{{post.user.id}}/{{post.id_post}}.jpg" class="post-pic">
+          <img src="/static/img/big/post/{{post.user.id}}/{{post.id_post}}.jpg" onclick="open_img()" style="cursor: pointer;" class="post-pic">
         {%endif%}
       </div>
 
@@ -132,6 +132,18 @@
     <script src="{% static "js/particles.js" %}"></script>
     <script src="{% static "js/particles-start.js" %}"></script>
     {% csrf_token %}
+
+    <script>
+      function open_img() {
+        Swal.fire({
+              position: 'top',
+              html: `<img src="/static/img/big/post/{{post.user.id}}/{{post.id_post}}.jpg" class="post-pic">`,
+              showConfirmButton: false,
+            })
+      }
+    </script>
+
+
     <script>
       edit_comment_val = ''
       id_post_val = ''
@@ -322,7 +334,7 @@
          })
       }
     
-      function delete_post_comment() {
+      function delete_post_comment(id_comment) {
         Swal.fire({
       position: 'top',
       icon: 'warning',
@@ -336,7 +348,7 @@
      
       if (result.isConfirmed) {
         const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-        fetch(`${window.location.origin}/post/delete-comment/${id_post_val}/`, {
+        fetch(`${window.location.origin}/post/delete-comment/${id_comment}/`, {
           method: "post",
           headers: {
             'Accept': 'application/json',
@@ -362,13 +374,13 @@
 
       function smallMore(el) {
         edit_comment_val = el.getAttribute('comment');
-        id_post_val = el.getAttribute('id_post');
+        id_comment_val = el.getAttribute('id_post');
         Swal.fire({
         position: 'top',
         showCancelButton: false,
         showConfirmButton: false,
         html:`   <div class="more-menu">
-          <p style="color: red;" onclick="delete_post_comment()">Удалить комментарий</p>
+          <p style="color: red;" onclick="delete_post_comment(${id_comment_val})">Удалить комментарий</p>
           <p onclick="edit_post_comment()">Редактировать комментарий</p>
           <p onclick="close_menu()" style="border-bottom: none;">Отмена</p>
         </div>`,   
@@ -376,18 +388,47 @@
       }
 
       function ownerSmallMore(el) {
-        id_post_val = el.getAttribute('id_post');
+        id_comment_val = el.getAttribute('id_post');
         Swal.fire({
         position: 'top',
         showCancelButton: false,
         showConfirmButton: false,
         html:`   <div class="more-menu">
-          <p style="color: red;" onclick="delete_post_comment()">Удалить комментарий</p>
+          <p style="color: red;" onclick="delete_post_comment(${id_comment_val})">Удалить комментарий</p>
           <p onclick="close_menu()" style="border-bottom: none;">Отмена</p>
         </div>`,   
       })
       }
     </script>
+
+    
+<script>
+  function favorite (id_post) {
+  const hide_like = '{{favorite}}'
+  let word_like = 'добавлена в избранное'
+  if (hide_like == 'True') word_like = 'удалена из избранного '
+  const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    fetch(`${window.location.origin}/post/add-favorite/${id_post}/`, {
+     method: "post",
+     headers: {
+       'Accept': 'application/json',
+       'Content-Type': 'application/json',
+       'X-CSRFToken': csrftoken,
+     },
+   }).then(response => response)
+     .then(result => { 
+       Swal.fire({
+         position: 'top',
+         icon: 'success',
+         title: `Запись была ${word_like}`,
+         showConfirmButton: false,
+         timer: 1000
+       }).then(() => {
+         window.location.href = `${window.location.origin}/post/${id_post}/`
+       })
+     })
+  }
+</script>
 
 
     {%if user.owner%}
@@ -527,33 +568,6 @@
     
     </script>
 
-    <script>
-      function favorite (id_post) {
-      const hide_like = '{{favorite}}'
-      let word_like = 'добавлена в избранное'
-      if (hide_like == 'True') word_like = 'удалена из избранного '
-      const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-        fetch(`${window.location.origin}/post/add-favorite/${id_post}/`, {
-         method: "post",
-         headers: {
-           'Accept': 'application/json',
-           'Content-Type': 'application/json',
-           'X-CSRFToken': csrftoken,
-         },
-       }).then(response => response)
-         .then(result => { 
-           Swal.fire({
-             position: 'top',
-             icon: 'success',
-             title: `Запись была ${word_like}`,
-             showConfirmButton: false,
-             timer: 1000
-           }).then(() => {
-             window.location.href = `${window.location.origin}/post/${id_post}/`
-           })
-         })
-      }
-    </script>
 
     <script>
     function more() {
@@ -586,15 +600,15 @@
     {%else%}
     <script>
       function more() {
-      let in_favorite = '{{post.favorite}}'
-      in_favorite == 'True' ? in_favorite = 'Добавить в избранное' : in_favorite = 'Удалить из избранного'
+        let in_favorite = '{{favorite}}'
+      in_favorite == 'True' ? in_favorite = 'Удалить из избранного' : in_favorite = 'Добавить в избранное'
         Swal.fire({
           position: 'top',
           showCancelButton: false,
           showConfirmButton: false,
           html:`   <div class="more-menu">
         <p onclick="copy()">Скопировать ссылку на пост</p>
-        <p onclick="favorite()">${in_favorite}</p>
+        <p onclick="favorite('{{post.id_post}}')">${in_favorite}</p>
         <p onclick="close_menu()" style="border-bottom: none;">Отмена</p>
       </div>`, 
           

@@ -57,8 +57,18 @@
           <p class="user-info-name_lastname">{{user.name_lastname}}</p>
         </div>
 
-        
+        <h5 style="margin: 20px 0 5px 0;">Описание</h5>
           <textarea type="text" class="post-info-textbox" placeholder="Напишите описание к фотографии..." id="comment" name="comment"></textarea> <br>
+          <h5 style="margin: 5px 0 5px 0;">Видимость записи</h5>
+          <div class="more-menu">
+            <select name="new-visibility" id="new-visibility" class="new-visibility">
+              <option value="all">Открытый доступ</option>
+              <option value="follower">Доступ для подписчиков</option>
+              <option value="link">Доступ по ссылке</option>
+              <option value="nobody">Архивировать запись</option>
+            </select>
+          </div>
+          
           <div class="buttons-block">
              <button class="save-post">Сохранить</button>
              <div class="delete-post" id="delete">Удалить</div>

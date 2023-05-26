@@ -15,9 +15,9 @@
       <p class="logo-name">Instyle</p>
       <form action="/signup/create/" method="post">
         {% csrf_token %}
-        <input type="email" name="email" placeholder="Эл. адрес" id="email" required>
-        <input type="text" name="name_lastname" placeholder="Имя и фамилия" id="name_lastname" required>
-        <input type="text" name="username" placeholder="Имя пользователя" id="username" required>
+        <input type="email" name="email" value="{{user.email}}" placeholder="Эл. адрес" id="email" required>
+        <input type="text" name="name_lastname" value="{{user.name_lastname}}" placeholder="Имя и фамилия" id="name_lastname" required>
+        <input type="text" name="username" value="{{user.username}}" placeholder="Имя пользователя" id="username" required>
         <input type="password" name="password" placeholder="Пароль" id="password" required>
         <button>Зарегистрироваться</button>
       </form>
@@ -49,7 +49,7 @@
     <script>
      Swal.fire({
         title: 'Регистрация',
-        text: 'Вы были успешно зарегистрированы. Для получения доступа к сервису, была выслана ссылка на эл. адрес для его подтверждения',
+        text: 'Для получения доступа к сервису, была выслана ссылка на эл. адрес для его подтверждения',
         icon: 'success',
         confirmButtonText: 'Продолжить'
       }).then((result) => {

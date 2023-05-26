@@ -24,6 +24,8 @@ def user_page(request, username):
         favorite = get_favorite(owner)
     else:
         user.is_follower = is_follower(user, owner)
+        archive = None
+        favorite = None
         posts = get_posts_for_other(user, owner)
     owner.followers = get_followers(owner)
     owner.followings = get_followings(owner)
@@ -31,7 +33,6 @@ def user_page(request, username):
     owner.count_followers = len(owner.followers)
     owner.count_followings = len(owner.followings)
     owner_profile = UserProfile.objects.get(user=owner.id)
-
     context = {
         'user': user,
         'owner': owner,

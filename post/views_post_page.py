@@ -96,9 +96,9 @@ def edit_comment(request, id_interaction):
     return HttpResponse()
 
 
-def delete_comment(request, id_interaction):
+def delete_comment(request, id_comment):
     user = get_user_by_token(request.COOKIES.get('instyle_token'))
-    delete_comment_from_db(user, id_interaction)
+    delete_comment_from_db(user, id_comment)
     return HttpResponse()
 
 

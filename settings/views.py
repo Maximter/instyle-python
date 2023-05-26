@@ -1,9 +1,10 @@
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, render
 from instyle import settings
 from settings.forms import AvatarForm
-from settings.service import edit_profile_data, save_avatar, update_password
-from signup.models import Token, UserProfile
+from settings.service import edit_profile_data, get_close_friends, get_followers_not_close, save_avatar, update_password
+from signup.models import Token, User, UserProfile
 from signup.service import generate_password
+from user.models import CloseFriend
 from user.service import get_user_by_token
 from django.http import HttpResponse
 from django.shortcuts import redirect
@@ -16,12 +17,16 @@ from django.template.loader import render_to_string
 def index(request):
     user = get_user_by_token(request.COOKIES.get('instyle_token'))
     profile = UserProfile.objects.get(user=user)
+    close_friends = get_close_friends(user)
+    followers_not_close = get_followers_not_close(user)
     form = AvatarForm()
     context = {
         'user': user,
         'form': form,
-        'profile': profile
-    }
+        'profile': profile,
+        'close_friends': close_friends,
+        'followers': followers_not_close
+    }    
     return render(request, 'settings/index.html', context)
 
 
@@ -55,6 +60,18 @@ def change_avatar(request):
 def delete_user(request):
     user = get_user_by_token(request.COOKIES.get('instyle_token'))
     user.delete()
+    return HttpResponse()
+
+def favorite(request, id_user):
+    friend = get_object_or_404(User, id=id_user)
+    user = get_user_by_token(request.COOKIES.get('instyle_token'))
+
+    try:
+        close_friend = CloseFriend.objects.get(user=user, friend=friend)
+        close_friend.delete()
+    except CloseFriend.DoesNotExist:
+        close_friend = CloseFriend(user=user, friend=friend)
+        close_friend.save()
     return HttpResponse()
 
 

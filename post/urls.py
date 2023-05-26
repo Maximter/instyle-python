@@ -17,6 +17,6 @@ urlpatterns = [
     path('add-favorite/<str:id_post>/', views_post_page.add_favorite),
     path('hide-comment/<str:id_post>/', views_post_page.hide_comment),
     path('edit-comment/<str:id_interaction>/', views_post_page.edit_comment),
-    path('delete-comment/<str:id_interaction>/', views_post_page.delete_comment),
+    path('delete-comment/<str:id_comment>/', views_post_page.delete_comment),
     path('<str:id_post>/', views_post_page.post_page),
 ]

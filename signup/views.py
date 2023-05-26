@@ -23,7 +23,7 @@ def create(request):
     }
     err_valid_user = valid_user(user)
     if err_valid_user:
-        return render(request, 'signup/index.html', context={'err': err_valid_user})
+        return render(request, 'signup/index.html', context={'err': err_valid_user, 'user': user})
     else:
         create_user(user)
     return render(request, 'signup/index.html', context={'success': True})
