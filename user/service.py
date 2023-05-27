@@ -4,7 +4,7 @@ from signup.models import Token, User
 from django.db.models import Q
 from django.db.models.signals import post_save
 
-from user.models import Blacklist, Follow
+from user.models import Blacklist, CloseFriend, Follow
 from django.dispatch import receiver
 
 def get_user_by_token(token):
@@ -33,6 +33,18 @@ def get_posts_for_other(user, owner):
         return None
     return posts
 
+def get_close_friend_posts(user, owner):
+    try:
+        if user.is_follower:
+            posts = Post.objects.filter(Q(user=owner) & (Q(visibility='all') | Q(visibility='follower') | Q(visibility='close_friend'))).order_by('-id')
+        else:
+            posts = Post.objects.filter(Q(user=owner) & Q(visibility='all') | Q(visibility='close_friend')).order_by('-id')
+    except User.DoesNotExist:
+        return None
+    return posts
+
+
+
 
 def follow_db(follower, following):
     try:
@@ -45,6 +57,14 @@ def follow_db(follower, following):
         Follow.objects.create_post(follower=follower, following=following,)
         send_notification(following, follower, 'follow')
     return realtion
+
+
+def is_close_friend(user, owner):
+    try:
+        CloseFriend.objects.get(user=owner, friend=user)
+        return True
+    except CloseFriend.DoesNotExist:
+        return False
 
 
 def is_follower(follower, following):

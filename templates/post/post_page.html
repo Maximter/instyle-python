@@ -59,6 +59,9 @@
       {%if post.visibility == 'all'%}
         <p class="show-visibility">Область видимости: Общий доступ</p>
       {%endif%}
+      {%if post.visibility == 'close_friend'%}
+        <p class="show-visibility">Область видимости: Доступ для близких друзей</p>
+      {%endif%}
       {%if post.visibility == 'link'%}
         <p class="show-visibility">Область видимости: Доступ по ссылке</p>
       {%endif%}
@@ -541,8 +544,9 @@
       html:`   <div class="more-menu">
         <select name="new-visibility" id="new-visibility" class="new-visibility">
           <option value="all">Открытый доступ</option>
-          <option value="follower">Доступ для подписчиков</option>
-          <option value="link">Доступ по ссылке</option>
+          <option value="close_friend">Для близких друзей</option>
+          <option value="follower">Для подписчиков</option>
+          <option value="link">По ссылке</option>
           <option value="nobody">Архивировать запись</option>
         </select>
       </div>`, 

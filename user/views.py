@@ -2,8 +2,8 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render
 
 from signup.models import User, UserProfile
-from user.models import Blacklist
-from .service import follow_db, get_archive, get_favorite, get_followers, get_followings, get_posts, get_posts_for_other, get_user_by_token, get_owner, is_banned, is_follower
+from user.models import Blacklist, CloseFriend
+from .service import follow_db, get_archive, get_close_friend_posts, get_favorite, get_followers, get_followings, get_posts, get_posts_for_other, get_user_by_token, get_owner, is_banned, is_close_friend, is_follower
 from django.contrib import messages
 
 def index(request):
@@ -29,7 +29,10 @@ def user_page(request, username):
         user.is_follower = is_follower(user, owner)
         archive = None
         favorite = None
-        posts = get_posts_for_other(user, owner)
+        if is_close_friend(user, owner):
+            posts = get_close_friend_posts(user, owner)
+        else:
+            posts = get_posts_for_other(user, owner)
         owner.is_banned = is_banned(user, owner)
         user.is_banned = is_banned(owner, user)
 
@@ -97,3 +100,20 @@ def unfollow(request, username):
     user = get_owner(username)
     follow_db(user, owner)
     return HttpResponseRedirect(f'/user/{owner.username}')
+
+
+def toggle_close_friend(request, user_id):
+    user = get_user_by_token(request.COOKIES.get('instyle_token'))
+    friend = get_object_or_404(User, id=user_id)
+
+    close_friend_entry = CloseFriend.objects.filter(user=user, friend=friend).first()
+
+    if close_friend_entry:
+        close_friend_entry.delete()
+        messages.success(request, f"{friend.username} был удален из близких друзей")
+    else:
+        CloseFriend.objects.create(user=user, friend=friend)
+        messages.success(request, f"{friend.username} был добавлен в близкие друзья")
+
+    referer = request.META.get('HTTP_REFERER')
+    return redirect(referer)

@@ -107,12 +107,6 @@
           </ul>
         </div>
 
-
-
-
-
-
-
         
         <div class="name-section">
           <h3>Список близких друзей</h3>
@@ -123,8 +117,12 @@
           <a href="/user/{{user.username}}" class="div-found-user" style="display: none;" id="divUser">
             <img src="#" class="found-avatar" id="imgUser">
             <p class="found-user-username" id="usernameUser"></p>
+            
+            <form action="#" method="post" id="form-search-add">
+              {% csrf_token %}
+              <button>Добавить / Удалить</button>
+            </form>
           </a>
-
 
 
           <ul>
@@ -139,7 +137,10 @@
                 {%endif%}
                 <p class="found-user-username">{{this.friend.username}}</p>
               </a> 
-              <button onclick="favorite(this)" id_user="{{this.friend.id}}">Удалить</button>
+              <form action="/user/close/{{this.friend.id}}/" method="post" style="margin: 0px;">
+                {% csrf_token %}
+                <button>Удалить</button>
+              </form>
               
             </li>
             {%endfor%}
@@ -148,16 +149,21 @@
             {%if followers%}
             {%for this in followers%}
             <li>
+              
               <a href="/user/{{this.follower.username}}" class="friend-block">
                 {%if this.avatar%}
-                  <img src="/static/img/small/avatar/{{this.follower.id}}.jpg" alt="{{this.follower.name_lastname}}" title="{{this.follower.name_lastname}}" class="notif-avatar">
-                {%else%}
-                  <img src="/static/img/small/avatar/standard.png" alt="{{this.name_lastname}}" title="{{this.follower.name_lastname}}" class="notif-avatar">
-                {%endif%}
+              <img src="/static/img/small/avatar/{{this.friend.id}}.jpg" alt="{{this.friend.name_lastname}}" title="{{this.friend.name_lastname}}" class="notif-avatar">
+            {%else%}
+              <img src="/static/img/small/avatar/standard.png" alt="{{this.friend.name_lastname}}" title="{{this.friend.name_lastname}}" class="notif-avatar">
+            {%endif%}
                 <p class="found-user-username">{{this.follower.username}}</p>
               </a> 
               
-              <button onclick="favorite(this)" id_user="{{this.follower.id}}">Добавить</button>
+              <form action="/user/close/{{this.follower.id}}/" method="post">
+                {% csrf_token %}
+                <button>Добавить</button>
+              </form>
+              
             </li>
             {%endfor%}
             {%endif%}
@@ -200,22 +206,6 @@
       <button style="margin-bottom: 20px; background:#ff3535;" onclick="delete_acc()">Удалить аккаунт</button>
     </section>
 
-<script>
-  // function favorite(el) {
-  //   id_user = el.attributes.id_user.value;
-  //   const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-  //   fetch(`${window.location.origin}/settings/favorite/${id_user}/`, {
-  //     method: "post",
-  //     headers: {
-  //       'Accept': 'application/json',
-  //       'Content-Type': 'application/json',
-  //       'X-CSRFToken': csrftoken,
-  //     },
-  //   });
-  //   el.textContent == 'Удалить' ? el.textContent == 'Удалить' 
-  // }
-</script>
-
   </script>
   <script src="/static/js/sweetalert2.all.min.js"></script>
   <script>
@@ -237,6 +227,7 @@
     const divUser = document.getElementById('divUser');
     const imgUser = document.getElementById('imgUser');
     const usernameUser = document.getElementById('usernameUser');
+    const form_search_add = document.getElementById('form-search-add');
 
     divUser.style = "display: none;";
     if (searchInput.value.length > 1 && searchInput.value.length <= 20) {
@@ -255,6 +246,7 @@
         divUser.href = `/user/${result.username}`;
         if (result.avatar) imgUser.src = `/static/img/small/avatar/${result.id}.jpg`;
         else imgUser.src = `/static/img/small/avatar/standard.png`;
+        form_search_add.action = `/user/close/${result.id}/`
         usernameUser.textContent = result.username;
       })
     }

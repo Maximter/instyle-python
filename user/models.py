@@ -23,6 +23,7 @@ class Follow(models.Model,):
 
     class Meta:
         db_table = 'follow'
+        unique_together = ['follower', 'following']
 
 
 class CloseFriend(models.Model):
