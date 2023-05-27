@@ -2,7 +2,7 @@ from django.http import HttpResponse
 from django.shortcuts import render
 import json
 from homepage.views import get_posts
-from post.service import check_valid_post, save_post_to_db, save_posts_from_vk, upload_post
+from post.service import check_valid_post, get_image_keywords, save_post_to_db, save_posts_from_vk, upload_post
 from signup.models import UserProfile
 from user.service import get_user_by_token
 from django.shortcuts import redirect
@@ -48,7 +48,8 @@ def create(request):
             return redirect('/post')
 
         id_post = upload_post(file, user)
-        save_post_to_db(id_post, comment, user, visibility)
+        keywords = get_image_keywords(user, id_post)
+        save_post_to_db(id_post, comment, user, visibility, keywords)
         messages.success(request, 'Пост будет опубликован через несколько секунд')
         return redirect('/post')
     messages.error(request, 'Ошибка файла')

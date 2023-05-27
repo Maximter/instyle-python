@@ -5,8 +5,9 @@ from signup.models import User
 
 
 class PostManager(models.Manager):
-    def create_post(self, id_post, user, comment, visibility):
-        post = self.create(id_post=id_post, user=user, comment=comment, visibility=visibility)
+    def create_post(self, id_post, user, comment, visibility, keywords):
+        keywords = ', '.join(keywords)
+        post = self.create(id_post=id_post, user=user, comment=comment, visibility=visibility, keywords=keywords)
         return post
 
 
@@ -32,8 +33,18 @@ class Post(models.Model,):
     hide_like = models.BooleanField(default=False)
     hide_comment = models.BooleanField(default=False)
     comment = models.CharField(max_length=1500)
+    keywords = models.TextField(blank=True)
     visibility = models.CharField(max_length=20, default='all')
     objects = PostManager()
+
+    @staticmethod
+    def get_posts_by_keywords(keywords):
+
+        posts = Post.objects.filter(keywords__icontains__in=keywords)
+        # keyword_posts = Post.objects.filter(keywords__icontains__in=flattened_keywords)
+
+
+        return posts
 
     class Meta:
         db_table = 'post'

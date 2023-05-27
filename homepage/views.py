@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from homepage.service import get_post_like_count, get_posts_in_homepage,\
     get_user_post_interaction
-from recommendation.service import get_popular_posts
+from recommendation.service import get_keywords, get_popular_posts, get_recommended_post
 from signup.models import UserProfile
 from user.service import get_user_by_token
 
@@ -31,7 +31,10 @@ def get_posts(user, start=0):
 
 
 def get_popular_posts_homepage(user):
-    posts = get_popular_posts()
+    keywords = get_keywords(user)
+    posts = get_recommended_post(keywords)
+    if len(posts) < 15:
+        posts = posts | get_popular_posts(15-len(posts))
     posts = get_post_like_count(posts)
     posts = get_user_post_interaction(user, posts)
     return posts

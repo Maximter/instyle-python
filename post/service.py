@@ -1,3 +1,4 @@
+import json
 import os
 import errno
 import re
@@ -5,10 +6,12 @@ import io
 import urllib.request
 from django.core.files.storage import FileSystemStorage
 from django.utils.crypto import get_random_string
+import requests
 from sorl.thumbnail import get_thumbnail
 from django.core.files.move import file_move_safe
 from django.db.models import Case, Value, When
 from django.core.files import File
+from instyle import settings
 from notification.service import delete_notification, send_notification
 from post.models import Comment, Like, Post
 
@@ -74,8 +77,21 @@ def upload_post(file, user):
     return id_post
 
 
-def save_post_to_db(id_post, comment, user, visibility):
-    Post.objects.create_post(id_post=id_post, comment=comment, user=user, visibility=visibility)
+def get_image_keywords(user, post_id):
+    api_key = settings.IMAGGA_API_KEY
+    api_secret = settings.IMAGGA_API_SECRET
+
+    response = requests.post(
+    'https://api.imagga.com/v2/tags?threshold=50',
+    auth=(api_key, api_secret),
+    files={'image': open(f'{settings.BASE_DIR}/static/img/small/post/{user.id}/{post_id}.jpg', 'rb')})
+    keywords = [tag['tag']['en'] for tag in response.json()['result']['tags']]
+
+    return keywords
+
+
+def save_post_to_db(id_post, comment, user, visibility, keywords):
+    Post.objects.create_post(id_post=id_post, comment=comment, user=user, visibility=visibility, keywords=keywords)
     return
 
 
@@ -211,5 +227,6 @@ def save_posts_from_vk(posts, user):
                 else:
                     fs = FileSystemStorage(location=f'static/img/small/post/{user.id}')
                 fs.save(f'{id_post}.jpg', File(io.BytesIO(image)))
-        Post.objects.create_post(id_post=id_post, comment='', user=user)
+        keywords = get_image_keywords(user, id_post)
+        Post.objects.create_post(id_post=id_post, comment='', user=user, keywords=keywords, visibility='all')
     return
