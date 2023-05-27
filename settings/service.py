@@ -2,7 +2,7 @@ import re
 from signup.models import User, UserProfile
 from django.contrib.auth.hashers import check_password, make_password
 from django.db.models import Q
-from user.models import CloseFriend, Follow
+from user.models import Blacklist, CloseFriend, Follow
 from django.core.exceptions import ObjectDoesNotExist
 
 
@@ -103,3 +103,6 @@ def get_followers_not_close(user):
     followers = Follow.objects.exclude(follower__in=close_friends).filter(following=user)
     
     return followers
+
+def get_black_list(user):
+    return Blacklist.objects.filter(user=user)

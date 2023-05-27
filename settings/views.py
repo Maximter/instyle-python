@@ -1,7 +1,7 @@
 from django.shortcuts import get_object_or_404, render
 from instyle import settings
 from settings.forms import AvatarForm
-from settings.service import edit_profile_data, get_close_friends, get_followers_not_close, save_avatar, update_password
+from settings.service import edit_profile_data, get_black_list, get_close_friends, get_followers_not_close, save_avatar, update_password
 from signup.models import Token, User, UserProfile
 from signup.service import generate_password
 from user.models import CloseFriend
@@ -20,12 +20,14 @@ def index(request):
     close_friends = get_close_friends(user)
     followers_not_close = get_followers_not_close(user)
     form = AvatarForm()
+    black_list = get_black_list(user)
     context = {
         'user': user,
         'form': form,
         'profile': profile,
         'close_friends': close_friends,
-        'followers': followers_not_close
+        'followers': followers_not_close,
+        'black_list': black_list
     }    
     return render(request, 'settings/index.html', context)
 

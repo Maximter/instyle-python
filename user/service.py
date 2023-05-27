@@ -2,8 +2,10 @@ from notification.service import delete_notification, send_notification
 from post.models import Favorite, Post
 from signup.models import Token, User
 from django.db.models import Q
-from user.models import Follow
+from django.db.models.signals import post_save
 
+from user.models import Blacklist, Follow
+from django.dispatch import receiver
 
 def get_user_by_token(token):
     try:
@@ -51,6 +53,31 @@ def is_follower(follower, following):
         return True
     except Follow.DoesNotExist:
         return False
+    
+def is_banned(user, owner):
+    try:
+        Blacklist.objects.get(user=user, blocked_user=owner)
+        return True
+    except Blacklist.DoesNotExist:
+        return False
+    
+
+@receiver(post_save, sender=Blacklist)
+def unfollow_if_banned(sender, instance, created, **kwargs):
+    # Check if a new Blacklist entry is created
+    if created:
+        blocking_user = instance.user
+        blocked_user = instance.blocked_user
+
+        # Check if the blocking user is following the blocked user
+        follow_entry = Follow.objects.filter(follower=blocking_user, following=blocked_user).first()
+        if follow_entry:
+            follow_entry.delete()
+
+        # Check if the blocked user is following the blocking user
+        follow_entry = Follow.objects.filter(follower=blocked_user, following=blocking_user).first()
+        if follow_entry:
+            follow_entry.delete()
 
 
 def get_followers(user):

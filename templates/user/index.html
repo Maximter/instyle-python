@@ -43,16 +43,29 @@
       <div class="info-block">
         <div class="username-block"> 
           <p class="user-username">{{owner.username}}</p>
-          {%if user.owner%}
+          {%if user.is_owner%}
             <button class="settings-button" onclick="window.location='/settings'">Настройки</button>
           {%else%}
+
+          {%if not user.is_banned and not owner.is_banned%}
           <button class="follow-button" onclick="window.location='/chat/{{owner.username}}'">Написать сообщение</button>
+          
           <form action="/user/follow/{{owner.username}}/" method="post">
             {% csrf_token %}
             {%if user.is_follower%}
             <button class="unfollow-button">Отписаться</button>
             {%else%}
             <button class="follow-button">Подписаться</button>
+            {%endif%}
+          </form>
+          {%endif%}
+
+          <form action="/user/block/{{owner.id}}/" method="post">
+            {% csrf_token %}
+            {%if owner.is_banned%}
+            <button class="follow-button">Разбанить</button>
+            {%else%}
+            <button class="follow-button">Забанить</button>
             {%endif%}
           </form>
           {%endif%}
@@ -75,7 +88,7 @@
     </section>
 
     <section class="main-section" id="main-section">
-      {%if user.owner%}
+      {%if user.is_owner%}
         <div class="chose-block">
           <div style="border-bottom: 1px #000 solid;" onclick="show_post()" id="button-post"><img src="{% static 'img/system/photo.svg' %}"> Записи</div>
           <div style="border-bottom: 0px #000 solid;" onclick="show_archive()" id="button-archive"><img src="{% static 'img/system/archive.svg' %}"> Архивированное</div>
@@ -144,6 +157,30 @@
 </script>
 
 <script>
+  // function ban() {
+  //   const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+  //       fetch(`${window.location.origin}/user/ban/{{owner.id}}/`, {
+  //         method: "post",
+  //         headers: {
+  //           'Accept': 'application/json',
+  //           'Content-Type': 'application/json',
+  //           'X-CSRFToken': csrftoken,
+  //         },
+  //       }).then(response => response)
+  //        .then(result => { 
+  //         console.log(result)
+  //          Swal.fire({
+  //            position: 'top',
+  //            icon: 'success',
+  //            title: 'Пользователь был забанен / разбанен',
+  //            showConfirmButton: false,
+  //            timer: 1000
+  //          })
+  //         });
+  // }
+</script>
+
+<script>
   let button_post = document.getElementById('button-post')
   let button_archive = document.getElementById('button-archive')
   let button_favorite = document.getElementById('button-favorite')
@@ -198,7 +235,7 @@
 </script>
     
   <script src="{% static 'js/sweetalert2.all.min.js' %}"></script>
-  {%if user.owner%}
+  {%if user.is_owner%}
   {%else%}
   <script>
     document.getElementById('upper-avatar').setAttribute('style', 'border: none;')
@@ -270,7 +307,7 @@
     }
   </script>
 
-  {%if user.owner%}
+  {%if user.is_owner%}
   <script>
         get_followers.onclick = () => {
       let htmlText = '<ul style="background: #fff">';
@@ -320,5 +357,35 @@
     }
   </script>
   {%endif%}
+
+
+  {% if messages %}
+  {% for message in messages %}
+
+  {% if message.tags == 'error' %}
+    <script>
+      Swal.fire({
+        title: 'Ошибка!',
+        text: '{{message}}',
+        icon: 'error',
+        confirmButtonText: 'Повторить попытку'
+      })
+    </script>
+{% endif %}
+
+{% if message.tags == 'success' %}
+    <script>
+      Swal.fire({
+        title: 'Успешно',
+        text: '{{message}}',
+        icon: 'success',
+        confirmButtonText: 'Продолжить'
+      })
+    </script>
+{% endif %}
+
+  {% endfor %}
+{% endif %}
+
   </body>
 </html>

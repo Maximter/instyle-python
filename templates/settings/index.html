@@ -81,6 +81,38 @@
 
 
 
+        <div class="name-section">
+          <h3>Черный список</h3>
+        </div>
+        <div class="block-close-friends">
+          <ul>
+            {%for this in black_list%}
+            <li>
+              <a href="/user/{{this.blocked_user.username}}" class="friend-block">
+                {%if this.avatar%}
+                  <img src="/static/img/small/avatar/{{this.blocked_user.id}}.jpg" alt="{{this.blocked_user.name_lastname}}" title="{{this.blocked_user.name_lastname}}" class="notif-avatar">
+                {%else%}
+                  <img src="/static/img/small/avatar/standard.png" alt="{{this.blocked_user.name_lastname}}" title="{{this.blocked_user.name_lastname}}" class="notif-avatar">
+                {%endif%}
+                <p class="found-user-username">{{this.blocked_user.username}}</p>
+              </a> 
+
+              <form action="/user/block/{{this.blocked_user.id}}/" method="post">
+                {% csrf_token %}
+                <button class="follow-button">Разбанить</button>
+              </form>
+              
+            </li>
+            {%endfor%}
+          </ul>
+        </div>
+
+
+
+
+
+
+
         
         <div class="name-section">
           <h3>Список близких друзей</h3>
@@ -169,20 +201,19 @@
     </section>
 
 <script>
-  function favorite(el) {
-    console.log(el.attributes)
-    id_user = el.attributes.id_user.value;
-    const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-    fetch(`${window.location.origin}/settings/favorite/${id_user}/`, {
-      method: "post",
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-        'X-CSRFToken': csrftoken,
-      },
-    });
-    el.textContent == 'Удалить' ? el.textContent == 'Удалить' 
-  }
+  // function favorite(el) {
+  //   id_user = el.attributes.id_user.value;
+  //   const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+  //   fetch(`${window.location.origin}/settings/favorite/${id_user}/`, {
+  //     method: "post",
+  //     headers: {
+  //       'Accept': 'application/json',
+  //       'Content-Type': 'application/json',
+  //       'X-CSRFToken': csrftoken,
+  //     },
+  //   });
+  //   el.textContent == 'Удалить' ? el.textContent == 'Удалить' 
+  // }
 </script>
 
   </script>

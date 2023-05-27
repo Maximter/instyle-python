@@ -57,5 +57,35 @@
       })
     </script>
 {% endif %}
+
+
+{% if messages %}
+  {% for message in messages %}
+
+  {% if message.tags == 'error' %}
+    <script>
+      Swal.fire({
+        title: 'Ошибка!',
+        text: '{{message}}',
+        icon: 'error',
+        confirmButtonText: 'Повторить попытку'
+      })
+    </script>
+{% endif %}
+
+{% if message.tags == 'success' %}
+    <script>
+      Swal.fire({
+        title: 'Успешно',
+        text: '{{message}}',
+        icon: 'success',
+        confirmButtonText: 'Продолжить'
+      })
+    </script>
+{% endif %}
+
+  {% endfor %}
+{% endif %}
+
   </body>
 </html>

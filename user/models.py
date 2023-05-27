@@ -33,3 +33,12 @@ class CloseFriend(models.Model):
     class Meta:
         db_table = 'close_friend'
         unique_together = ['user', 'friend']
+
+
+class Blacklist(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    blocked_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='blocked_by')
+
+    class Meta:
+        db_table = 'black_list'
+        unique_together = ['user', 'blocked_user']
