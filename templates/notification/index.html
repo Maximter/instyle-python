@@ -67,16 +67,9 @@
               {%endif%}
             
             {%if this.notification_type != 'follow'%}
-              {%if this.mp4%}
-                <a href="/post/{{this.post.id_img}}">
-                <video class="notif-post" style="object-fit: contain;">
-                  <source src="/img/post/postedVid/{{this.post.id_img}}.mp4" type='video/mp4;'>
-                </video>
-              {%else%}
-                <a href="/post/{{this.post.id_post}}">
-                  <img src="/static/img/small/post/{{user.id}}/{{this.post.id_post}}.jpg" class="notif-post">
-                </a>
-              {%endif%}
+              <a href="/post/{{this.post.id_post}}">
+                <img src="/static/img/small/post/{{user.id}}/{{this.post.id_post}}.jpg" class="notif-post">
+              </a>
             {%endif%}
               
           </li>  

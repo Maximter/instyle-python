@@ -46,13 +46,7 @@
             <p class="owner-username">{{this.user.username}}</p>
               </a>
               <a href="/post/{{this.id_post}}" class="bar">
-                  {%if this.mp4%}
-                  <video class="post-pic" controls="controls">
-                    <source src="/static/img/post/postedVid/{{this.user.id}}/{{this.id_post}}.mp4" type='video/mp4;'>
-                  </video>
-                  {%else%}
-                  <img src="/static/img/medium/post/{{this.user.id}}/{{this.id_post}}.jpg" class="post-pic">
-                {%endif%}
+                <img src="/static/img/medium/post/{{this.user.id}}/{{this.id_post}}.jpg" class="post-pic">
               </a>
               <div class="under-post">
                 {%if this.user_like%}
@@ -131,13 +125,7 @@
             <p class="owner-username">${element.user.username}</p>
               </a>
               <a href="/post/${element.id_post}" class="bar">
-                ` + (element.mp4 ? `
-                  <video class="post-pic" controls="controls">
-                    <source src="/static/img/post/postedVid/${element.user.id}/${element.id_post}.mp4" type='video/mp4;'>
-                  </video>
-                  ` : `
                   <img src="/static/img/medium/post/${element.user.id}/${element.id_post}.jpg" class="post-pic">
-                  `) + `
               </a>
               <div class="under-post">
                 ` + (element.user_like ? ` 

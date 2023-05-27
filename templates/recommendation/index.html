@@ -45,13 +45,7 @@
         {%for this in posts%}
           <li>
             <a href="/post/{{this.id_post}}">
-                {%if this.mp4%}
-                  <video class="post-pic" style="object-fit: cover;">
-                    <source src="static/img/video/{{this.user.id}}/{{this.id_post}}.mp4" type='video/mp4;'>
-                  </video>
-                {%else%}
-                  <img data-src="/static/img/small/post/{{this.user.id}}/{{this.id_post}}.jpg" src="/static/img/small/pattern/lazy.jpg" class="lazyload post-pic">
-                {%endif%}
+                <img data-src="/static/img/small/post/{{this.user.id}}/{{this.id_post}}.jpg" src="/static/img/small/pattern/lazy.jpg" class="lazyload post-pic">
             </a>
           </li>
          {%endfor%}

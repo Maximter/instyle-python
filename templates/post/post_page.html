@@ -46,13 +46,7 @@
          
         </div>
 
-        {%if post.mp4%}
-          <video class="post-pic" controls="controls">
-            <source src="{% static 'img/video/{{post.user.id}}/{{post.id_post}}.mp4' %}" type='video/mp4;'>
-          </video>
-        {%else%}
-          <img src="/static/img/big/post/{{post.user.id}}/{{post.id_post}}.jpg" onclick="open_img(this)" style="cursor: pointer;" class="post-pic">
-        {%endif%}
+        <img src="/static/img/big/post/{{post.user.id}}/{{post.id_post}}.jpg" onclick="open_img(this)" style="cursor: pointer;" class="post-pic">
       </div>
 
     {%if user.id == post.user.id%}

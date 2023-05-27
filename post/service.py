@@ -21,7 +21,7 @@ def check_valid_post(file, comment):
         }
 
     filename, file_extension = os.path.splitext(file.name)
-    match = re.match('\.(jpg|JPG|jpeg|JPEG|png|PNG|mp4)$', file_extension)
+    match = re.match('\.(jpg|JPG|jpeg|JPEG|png|PNG)$', file_extension)
     if not match:
         return {
             'valid': False,
