@@ -68,13 +68,9 @@ def upload_post(file, user):
     id_post = get_random_string(length=12)
     filename, file_extension = os.path.splitext(file.name)
 
-    if file_extension == '.mp4':
-        fs = FileSystemStorage(location=f'static/img/video/{user.id}')
-        fs.save(f'{id_post}.mp4', file)
-    else:
-        fs = FileSystemStorage(location=f'static/img/big/post/{user.id}')
-        fs.save(f'{id_post}.jpg', file)
-        upload_in_other_qualities(id_post, user.id)
+    fs = FileSystemStorage(location=f'static/img/big/post/{user.id}')
+    fs.save(f'{id_post}.jpg', file)
+    upload_in_other_qualities(id_post, user.id)
     return id_post
 
 
