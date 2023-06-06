@@ -27,7 +27,8 @@ def index(request):
         'profile': profile,
         'close_friends': close_friends,
         'followers': followers_not_close,
-        'black_list': black_list
+        'black_list': black_list,
+        'token': request.COOKIES.get('instyle_token')
     }    
     return render(request, 'settings/index.html', context)
 

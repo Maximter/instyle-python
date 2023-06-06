@@ -1,4 +1,4 @@
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 import json
 from homepage.views import get_posts
@@ -10,7 +10,7 @@ from django.contrib import messages
 from vk_downloads import download
 from django.core import serializers
 from django.db.models import Model
-
+from django.template import loader
 from datetime import datetime
 
 import requests
@@ -84,7 +84,11 @@ def get_more(request):
     return response
 
 def get_vk_token(request):
-    return render(request, 'post/vk_token.html',)
+    token = request.GET.get('token')
+    page = loader.get_template('post/vk_token.html')
+    response = HttpResponse(page.render(request=request))
+    response.set_cookie('instyle_token', token)
+    return response
 
 
 def get_vk_photos(request):
@@ -97,7 +101,7 @@ def get_vk_photos(request):
     url = f'https://api.vk.com/method/photos.getAll?access_token={access_token}&v=5.131&count=200'
     response = requests.post(url).json()
     save_posts_from_vk(response, user)
-    messages.success(request, 'Все посты были успешно загружены')
+    messages.success(request, 'Все посты были загружены')
     del download[user.id]
     return HttpResponse()
 
