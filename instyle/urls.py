@@ -9,4 +9,5 @@ urlpatterns = [
     path('settings/', include('settings.urls')),
     path('recommendation/', include('recommendation.urls')),
     path('notification/', include('notification.urls')),
+    path('chat/', include('chat.urls')),
 ]
