@@ -14,6 +14,7 @@ from django.core.files import File
 from instyle import settings
 from notification.service import delete_notification, send_notification
 from post.models import Comment, Like, Post
+import shutil
 
 
 def check_valid_post(file, comment):
@@ -216,17 +217,25 @@ def save_posts_from_vk(posts, user):
         id_post = post['id']
         if str(id_post) in all_posts:
             continue
+        downloaded_max = False
         for size in post['sizes']:
-            if size['type'] == 'w' or size['type'] == 'q' or size['type'] == 'y':
+            if size['type'] == 'w' or size['type'] == 'q' or size['type'] == 'y' or size['type'] == 'z':
                 response = urllib.request.urlopen(size['url'])
-                image = response.read()
+                image = response.read() 
                 if size['type'] == 'w':
+                    downloaded_max = True
                     fs = FileSystemStorage(location=f'static/img/big/post/{user.id}')
                 elif size['type'] == 'y':
                     fs = FileSystemStorage(location=f'static/img/medium/post/{user.id}')
+                elif size['type'] == 'z' and not downloaded_max:
+                    downloaded_max = True
+                    fs = FileSystemStorage(location=f'static/img/big/post/{user.id}')
                 else:
                     fs = FileSystemStorage(location=f'static/img/small/post/{user.id}')
                 fs.save(f'{id_post}.jpg', File(io.BytesIO(image)))
+        
+        if not downloaded_max:
+            shutil.copyfile(f'static/img/medium/post/{user.id}/{id_post}.jpg', f'static/img/big/post/{user.id}/{id_post}.jpg')
         keywords = get_image_keywords(user, id_post)
         Post.objects.create_post(id_post=id_post, comment='', user=user, keywords=keywords, visibility='all')
     return

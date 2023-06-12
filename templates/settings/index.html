@@ -6,6 +6,7 @@
     <title>Instyle</title>
     <link rel="stylesheet" type="text/css" href="/static/css/settings.css"/>
     <link rel="shortcut icon" type="image/x-icon" href="/static/img/system/title-logo.png" />
+    <link rel="stylesheet" media="all and (orientation:portrait)" href="{% static "css/settings-mobile.css" %}">
   </head>
   <body>
     <header>
@@ -32,24 +33,39 @@
     <section class="main-section">
       <h1>Настройки</h1>
 
+      <div class="chose-block">
+        <div style="border-bottom: 1px #000 solid;" onclick="show_user()" id="button-user"><img src="{% static 'img/system/settings-user.svg' %}"></div>
+        <div style="border-bottom: 0px #000 solid;" onclick="show_lock()" id="button-lock"><img src="{% static 'img/system/settings-lock.svg' %}"></div>
+        <div style="border-bottom: 0px #000 solid;" onclick="show_password()" id="button-password"><img src="{% static 'img/system/settings-password.svg' %}" ></div>
+        <div style="border-bottom: 0px #000 solid;" onclick="show_vk()" id="button-vk"><img src="{% static 'img/system/settings-vk.svg' %}" ></div>
+      </div>
+
+      <div class="under-chose-block">
+        <div> Профиль </div>
+        <div> Конфиденциальность </div>
+        <div> Пароль </div>
+        <div> Вконтакте </div>
+      </div>
+
       <div class="settings-block">
         
+        <div id="div-user">
         <form action="/settings/change-avatar" enctype="multipart/form-data" method="post">
           {% csrf_token %}
           <div class="name-section">
             <h3>Изменить аватар</h3>
           </div>
           {%if profile.avatar_big%}
-          <img src="/static/img/big/avatar/{{user.id}}.jpg" alt="{{user.name_lastname}}" title="{{user.name_lastname}}" class="user-big-avatar" id="settings-avatar">
+            <img src="/static/img/big/avatar/{{user.id}}.jpg" alt="{{user.name_lastname}}" title="{{user.name_lastname}}" class="user-big-avatar" id="settings-avatar">
           {%else%}
-          <img src="/static/img/big/avatar/standard.jpg" alt="{{user.name_lastname}}" title="{{user.name_lastname}}" class="user-big-avatar" id="settings-avatar">
+            <img src="/static/img/big/avatar/standard.png" alt="{{user.name_lastname}}" title="{{user.name_lastname}}" class="user-big-avatar" id="settings-avatar">
           {%endif%}
 
           {{form.as_p}}
           <button>Изменить</button>
         </form>
+      
 
-        <div>
         <form action="/settings/edit-profile" method="post">
           {% csrf_token %}
           <div class="name-section">
@@ -71,7 +87,7 @@
             <textarea name="bio" value="{{profile.bio}}">{{profile.bio}}</textarea>
           </div>
 
-           <div class="block-change">
+          <div class="block-change">
             <h5>Ваш эл. адрес</h5>
             <input type="text" value="{{user.email}}" name="email" required>
           </div>
@@ -79,8 +95,12 @@
           <button>Изменить</button>
         </form>
 
+        <button style="margin-bottom: 20px; background:#ff3535;" onclick="window.location='/login'">Выход</button>
+      <button style="margin-bottom: 20px; background:#ff3535;" onclick="delete_acc()">Удалить аккаунт</button>
+      </div>
 
 
+      <div id="div-lock"  style="display: none;">
         <div class="name-section">
           <h3>Черный список</h3>
         </div>
@@ -169,10 +189,10 @@
             {%endif%}
           </ul>
         </div>
+      </div>
 
 
-
-
+      <div id="div-password"  style="display: none;">
         <form action="/settings/change-password" method="post">
           {% csrf_token %}
           <div class="name-section">
@@ -197,13 +217,15 @@
           <a href="/settings/forgot-password" style="color: #0095f6; font-size: 14px;">Я не помню пароль</a> <br>
           <button class="last-element">Изменить</button>
         </form>
+      </div>
 
+      <div id="div-vk" style="display: none;">
+        <a href="https://oauth.vk.com/authorize?client_id=51622458&redirect_uri={{base_url}}/post/get_vk_token?token={{token}}&scope=photos,offline&response_type=token"><img src="/static/img/system/export-vk.svg" class="export-vk"></a> <br>
+    </div>
 
       </div>
       
-      <a href="https://oauth.vk.com/authorize?client_id=51622458&redirect_uri=http://localhost:8000/post/get_vk_token?token={{token}}&scope=photos,offline&response_type=token"><img src="/static/img/system/export-vk.svg" class="export-vk"></a> <br>
-      <button style="margin-bottom: 20px; background:#ff3535;" onclick="window.location='/login'">Выход</button>
-      <button style="margin-bottom: 20px; background:#ff3535;" onclick="delete_acc()">Удалить аккаунт</button>
+     
     </section>
 
   </script>
@@ -216,6 +238,69 @@
     const [file] = input_image.files
     if (file) settings_avatar.src = URL.createObjectURL(file)
   }
+  </script>
+
+  <script>
+      let button_user = document.getElementById('button-user')
+      let button_lock = document.getElementById('button-lock')
+      let button_password = document.getElementById('button-password')
+      let button_vk = document.getElementById('button-vk')
+      let div_user = document.getElementById('div-user')
+      let div_lock = document.getElementById('div-lock')
+      let div_password = document.getElementById('div-password')
+      let div_vk = document.getElementById('div-vk')
+
+      function show_user() {
+        button_user.style = 'border-bottom: 1px #000 solid;'
+        button_lock.style = 'border-bottom: 0px #000 solid;'
+        button_password.style = 'border-bottom: 0px #000 solid;'
+        button_vk.style = 'border-bottom: 0px #000 solid;'
+        
+        
+        div_user.style = 'display: block;'
+        div_lock.style = 'display: none;'
+        div_password.style = 'display: none;'
+        div_vk.style = 'display: none;'
+      }
+
+      function show_lock() {
+        button_user.style = 'border-bottom: 0px #000 solid;'
+        button_lock.style = 'border-bottom: 1px #000 solid;'
+        button_password.style = 'border-bottom: 0px #000 solid;'
+        button_vk.style = 'border-bottom: 0px #000 solid;'
+        
+        
+        div_user.style = 'display: none;'
+        div_lock.style = 'display: block;'
+        div_password.style = 'display: none;'
+        div_vk.style = 'display: none;'
+      }
+
+      function show_password() {
+        button_user.style = 'border-bottom: 0px #000 solid;'
+        button_lock.style = 'border-bottom: 0px #000 solid;'
+        button_password.style = 'border-bottom: 1px #000 solid;'
+        button_vk.style = 'border-bottom: 0px #000 solid;'
+        
+        
+        div_user.style = 'display: none;'
+        div_lock.style = 'display: none;'
+        div_password.style = 'display: block;'
+        div_vk.style = 'display: none;'
+      }
+
+      function show_vk() {
+        button_user.style = 'border-bottom: 0px #000 solid;'
+        button_lock.style = 'border-bottom: 0px #000 solid;'
+        button_password.style = 'border-bottom: 0px #000 solid;'
+        button_vk.style = 'border-bottom: 1px #000 solid;'
+        
+        
+        div_user.style = 'display: none;'
+        div_lock.style = 'display: none;'
+        div_password.style = 'display: none;'
+        div_vk.style = 'display: block;'
+      }
   </script>
 
 

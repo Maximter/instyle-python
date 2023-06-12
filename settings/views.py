@@ -21,6 +21,7 @@ def index(request):
     followers_not_close = get_followers_not_close(user)
     form = AvatarForm()
     black_list = get_black_list(user)
+    base_url = settings.BASE_URL
     context = {
         'user': user,
         'form': form,
@@ -28,7 +29,8 @@ def index(request):
         'close_friends': close_friends,
         'followers': followers_not_close,
         'black_list': black_list,
-        'token': request.COOKIES.get('instyle_token')
+        'token': request.COOKIES.get('instyle_token'),
+        'base_url': base_url
     }    
     return render(request, 'settings/index.html', context)
 

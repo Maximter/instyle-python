@@ -5,10 +5,11 @@
   <head>
     <meta charset="utf-8" />
     <title>@{{owner.username}}</title>
-    <link rel="stylesheet" href="{% static "css/profile-page.css" %}" />
+    <link rel="stylesheet" media="all and (orientation:landscape)"  href="{% static "css/profile-page.css" %}" />
     <link rel="shortcut icon" type="image/x-icon"  href="{% static "img/system/title-logo.png" %}" />
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/lazyload@2.0.0-rc.2/lazyload.js"></script>
+    <link rel="stylesheet" media="all and (orientation:portrait)" href="{% static "css/profile-page-mobile.css" %}">
   </head>
   <body>
     <header>
@@ -73,13 +74,13 @@
         </div>
        
        <div class="numbers-block">
-        <p>публикаций : {{owner.count_post}}</p>
+        <p class="click">публикаций : {{owner.count_post}}</p>
         <p class="click" id="get_followers">подписчиков : {{owner.count_followers}}</p>
         <p class="click" id="get_followings">подписок : {{owner.count_followings}}</p>
        </div>
        <div class="bio-block">
         <p>{{owner.name_lastname}}</p>
-        <p>{{owner.bio}}</p>
+        <p>{{owner_profile.bio}}</p>
         
      
        </div>
@@ -96,7 +97,7 @@
         </div>
       {%endif%}
 
-      <ul>
+      <ul id="allposts">
         {%for this in posts%}
           <li class="post">
             <a href="/post/{{this.id_post}}">

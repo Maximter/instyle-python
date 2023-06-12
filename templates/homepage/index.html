@@ -6,6 +6,7 @@
     <title>Instyle</title>
     <link rel="stylesheet" href="{% static "css/main-page.css" %}" />
     <link rel="shortcut icon" type="image/x-icon" href="{% static "img/system/title-logo.png" %}" />
+    <link rel="stylesheet" media="all and (orientation:portrait)" href="{% static "css/main-page-mobile.css" %}">
   </head>
   <body>
     <header>
@@ -56,9 +57,9 @@
                 {%endif%}
 
                 {%if this.hide_like == False%}
-                <p class="comment-text" style="margin: 0 0 0 10px;"><span style="font-weight: 500; " id="likes_{{this.id_post}}" likes="{{this.like_count}}" >Отметок нравится: {{this.like_count}}</span></p>
+                <p class="comment-text" style="margin: 0 0 0 10px;"><span class="text-like" id="likes_{{this.id_post}}" likes="{{this.like_count}}" >Отметок нравится: {{this.like_count}}</span></p>
                 {%else%}
-                <p class="comment-text" style="margin: 0 0 0 10px;"><span style="font-weight: 500; " id="likes_{{this.id_post}}" >Нравится некоторым людям</span></p>
+                <p class="comment-text" style="margin: 0 0 0 10px;"><span class="text-like" id="likes_{{this.id_post}}" >Нравится некоторым людям</span></p>
                 {%endif%}
               </div>
 
@@ -75,9 +76,10 @@
     </div>
     </li>
   {%endfor%}
+  <button class="button_more" onclick="load_more(this)">Смотреть предыдущие посты</button>
+  <h2>Интересное</h2>
       </ul>
-          <button class="button_more" onclick="window.location='/recommendation'">Смотреть популярные посты</button>
-          <button class="button_more" onclick="load_more(this)">Смотреть предыдущие посты</button>
+          
           {%endif%}
     </section>
     </div>
@@ -114,8 +116,9 @@
           } else {
           el.style = 'display: block;'
           result.forEach(element => {
-            all_posts.innerHTML += `
-            <li>
+            const newLi = document.createElement('li');
+            
+            newLi.innerHTML = `
               <a href="/user/${element.user.username}" class="owner-block">
                 ` + (element.avatar ? `
                 <img src="/static/img/small/avatar/${element.user.id}.jpg" alt="${element.user.username}" title="${element.user.name_lastname}" class="user-avatar owner-avatar" id="upper-avatar">
@@ -135,9 +138,9 @@
                   `) + `
 
                 ` + (element.hide_like == false ? ` 
-                  <p class="comment-text" style="margin: 0 0 0 10px;"><span style="font-weight: 500; " id="likes_${element.id_post}" likes="${element.like_count}" >Отметок нравится: ${element.like_count}</span></p>
+                  <p class="comment-text" style="margin: 0 0 0 10px;"><span class="text-like" id="likes_${element.id_post}" likes="${element.like_count}" >Отметок нравится: ${element.like_count}</span></p>
                 ` : `
-                  <p class="comment-text" style="margin: 0 0 0 10px;"><span style="font-weight: 500; " id="likes_${element.id_post}" >Нравится некоторым людям</span></p>
+                  <p class="comment-text" style="margin: 0 0 0 10px;"><span class="text-like" id="likes_${element.id_post}" >Нравится некоторым людям</span></p>
                 `) + `
               </div> 
 
@@ -151,9 +154,10 @@
             ${element.comment}
           </p>
           ` : ` `) + `
-    </div>
-    </li>`
+    </div> `
+      el.parentElement.insertBefore(newLi, el)
           });}
+          
           })
       }
     </script>
@@ -172,21 +176,31 @@
           },
         });
         const count = document.getElementById(`likes_${id_img}`);
+        counts = document.querySelectorAll(`[id=likes_${id_img}]`);
+       
+      console.log( )
         if (el.src.indexOf('notification') > -1) {
-          el.src = "/static/img/system/liked.svg";
-
-         
           if (hide_like == 'False' || hide_like == 'false')
-            count.attributes.likes.value = ++count.attributes.likes.value;
+          counts.forEach(element => {
+            element.attributes.likes.value = ++element.attributes.likes.value;
+          });
+            
         }
         else {
-          el.src = "/static/img/system/notification-empty.svg";
           if (hide_like == 'False' || hide_like == 'false')
-            count.attributes.likes.value = --count.attributes.likes.value;
+          counts.forEach(element => {
+            element.attributes.likes.value = --element.attributes.likes.value;
+          });
+          
           
         }
         if (hide_like == 'False' || hide_like == 'false')
-          count.innerHTML = `Отметок нравится: ${count.attributes.likes.value}`;
+        counts.forEach(element => {
+            if (element.parentElement.previousElementSibling.src == "{{base_url}}/static/img/system/liked.svg") element.parentElement.previousElementSibling.src = "/static/img/system/notification-empty.svg"
+            else element.parentElement.previousElementSibling.src = "/static/img/system/liked.svg"
+            element.innerHTML = `Отметок нравится: ${element.attributes.likes.value}`;
+          });
+          
         
       }
 
@@ -275,6 +289,80 @@
       })
       }
      
+    </script>
+
+    <script>
+    let main_section = document.getElementById('main-section')
+    let download_started = false
+    main_section.addEventListener("scroll", function (event) {
+      if (main_section.scrollHeight - main_section.scrollTop < 3000 && !download_started) {
+        download_started = true
+        
+        all_posts = document.getElementById('all_posts')
+        count = all_posts.getElementsByTagName("li").length
+        const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        fetch(`/get-recommendation`, {
+         method: "GET",
+         headers: {
+           'Accept': 'application/json',
+           'Content-Type': 'application/json',
+           'X-CSRFToken': csrftoken,
+         },}).then(response => response.json())
+         .then(result => { 
+          if (result.length == 0) {
+            Swal.fire({
+             position: 'top',
+             icon: 'success',
+             title: 'Вы просмотрели все записи',
+             showConfirmButton: false,
+             timer: 1000
+           })
+          } else {
+          result.forEach(element => {
+            all_posts.innerHTML += `
+            <li>
+              <a href="/user/${element.user.username}" class="owner-block">
+                ` + (element.avatar ? `
+                <img src="/static/img/small/avatar/${element.user.id}.jpg" alt="${element.user.username}" title="${element.user.name_lastname}" class="user-avatar owner-avatar" id="upper-avatar">
+                ` : `
+                <img src="/static/img/small/avatar/standard.png" alt="${element.user.username}" title="${element.user.name_lastname}" class="user-avatar owner-avatar" id="upper-avatar">
+                `) + `
+            <p class="owner-username">${element.user.username}</p>
+              </a>
+              <a href="/post/${element.id_post}" class="bar">
+                  <img src="/static/img/medium/post/${element.user.id}/${element.id_post}.jpg" class="post-pic">
+              </a>
+              <div class="under-post">
+                ` + (element.user_like ? ` 
+                    <img src="{% static 'img/system/liked.svg' %}" title="Нравится" class="like" onclick="like(this, '${element.id_post}', '${element.hide_like}')">
+                  ` : `
+                    <img src="{% static 'img/system/notification-empty.svg' %}" title="Нравится" class="like" onclick="like(this, '${element.id_post}', '${element.hide_like}')">
+                  `) + `
+
+                ` + (element.hide_like == false ? ` 
+                  <p class="comment-text" style="margin: 0 0 0 10px;"><span class="text-like" id="likes_${element.id_post}" likes="${element.like_count}" >Отметок нравится: ${element.like_count}</span></p>
+                ` : `
+                  <p class="comment-text" style="margin: 0 0 0 10px;"><span class="text-like" id="likes_${element.id_post}" >Нравится некоторым людям</span></p>
+                `) + `
+              </div> 
+
+
+        <div class="comments">
+          ` + (element.comment ? ` 
+          <p class="comment-text">
+            <a href="/user/${element.user.username}">
+              <span style="font-weight: 500;">${element.user.username}:</span>
+            </a> 
+            ${element.comment}
+          </p>
+          ` : ` `) + `
+    </div>
+    </li>`
+          });}
+          download_started = false
+          })           
+      }
+    })
     </script>
 
 {% if messages %}

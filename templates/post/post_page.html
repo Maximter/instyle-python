@@ -6,6 +6,7 @@
     <title>Instyle</title>
     <link rel="stylesheet" href="{% static "css/post-img.css" %}" />
     <link rel="shortcut icon" type="image/x-icon"  href="{% static "img/system/title-logo.png" %}" />
+    <link rel="stylesheet" media="all and (orientation:portrait)" href="{% static "css/post-img-mobile.css" %}">
   </head>
   <body>
     <header>
@@ -75,9 +76,9 @@
         {%endif%}
 
         {%if post.hide_like == False%}
-            <p class="comment-text" style="margin: 0 0 0 10px;"><span style="font-weight: 500; " id="likes_{{post.id_post}}" likes="{{post.interaction.like_count}}" >Отметок нравится: {{post.interaction.like_count}}</span></p>
+            <p class="comment-text" style="margin: 0 0 0 10px;"><span  class="text-like" id="likes_{{post.id_post}}" likes="{{post.interaction.like_count}}" >Отметок нравится: {{post.interaction.like_count}}</span></p>
         {%else%}
-        <p class="comment-text" style="margin: 0 0 0 10px;"><span style="font-weight: 500; " id="likes_{{post.id_post}}" >Нравится некоторым людям</span></p>
+        <p class="comment-text" style="margin: 0 0 0 10px;"><span  class="text-like" id="likes_{{post.id_post}}" >Нравится некоторым людям</span></p>
         {%endif%}
       </div>
 
