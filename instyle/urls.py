@@ -1,4 +1,5 @@
 from django.urls import include, path
+# from chat.routing import websocket_urlpatterns
 
 urlpatterns = [
     path('', include('homepage.urls')),
@@ -10,4 +11,5 @@ urlpatterns = [
     path('recommendation/', include('recommendation.urls')),
     path('notification/', include('notification.urls')),
     path('chat/', include('chat.urls')),
+    # path('ws/', include((websocket_urlpatterns, 'ws-chat'), namespace='ws')),
 ]

@@ -30,29 +30,38 @@
       </section>
     </header>
     <section class="main-section">
+      
       <ul class="chats" id="outputChats">
+
+        <section class="find-section">
+          <h2>Поиск</h2>
+          <input type="text" placeholder="Введите никнейм пользователя" class="input-find" id="searchInput">
+            <div href="#" class="div-found-user" style="display: none;" id="divUser">
+              <img src="#" class="found-avatar" id="imgUser">
+              <p class="found-user-username" id="usernameUser"></p>
+            </div>
+        </section>
         
-        {%for this in chats%}
-          {%if this.sender%}
-          <li class="chat" id_chat="{{this.id_chat}}" username="{{this.interlocutor.username}}" id="chat" online="{{this.interlocutor.online}}" lastMessage="Вы: {{this.info.last_message_content}}">
-           {%else%}
-           <li class="chat" id_chat="{{this.id_chat}}" username="{{this.interlocutor.username}}" id="chat" online="{{this.interlocutor.online}}" lastMessage="{{this.info.last_message_content}}"></li>
-           {%endif%} 
-            {%if profile.avatar_small%}
-            <img src="/static/img/small/avatar/{{user.id}}.jpg" alt="{{user.name_lastname}}" title="{{user.name_lastname}}" class="user-avatar" id="upper-avatar">
-            {%else%}
-            <img src="/static/img/small/avatar/standard.png" alt="{{user.name_lastname}}" title="{{user.name_lastname}}" class="user-avatar" id="upper-avatar">
-            {%endif%}
-               <div online="{{this.interlocutor.online}}" class="onlinePoint" id="onlinePoint" id_chat="{{this.id_chat}}" style="display:none"></div>
-              <div online="{{this.interlocutor.online}}" id_chat="{{this.id_chat}}" class="inside">
-                  <p id="chatName" id_chat="{{this.id_chat}}" class="lastSenderText" online="{{this.interlocutor.online}}">{{this.interlocutor.name_lastname}}</p>
-                  <p id="lastMessage" id_chat="{{this.id_chat}}" class="lastMessageText" online="{{this.interlocutor.online}}">{%if this.sender%}Вы: {%endif%}{{this.info.last_message_content}}</p>
-              </div>
-              <div id_chat="{{this.id_chat}}" online="{{this.interlocutor.online}}">
-                  <p id="time_last_message" class="time_last_message" id_chat="{{this.id_chat}}" online="{{this.interlocutor.online}}">{{this.info.last_message_time}}</p>
-              </div>                             
+        {% for chat_room in chats %}
+        {% if chat_room.user1 == user %}
+          <li class="div-found-user" id_dialog="{{chat_room.room_identifier}}" username="{{chat_room.user2.username}}" id="{{chat_room.user2.id}}">
+        {% else %}
+          <li class="div-found-user" id_dialog="{{chat_room.room_identifier}}" username="{{chat_room.user1.username}}" id="{{chat_room.user1.id}}">
+        {% endif %}
+            
+            {% if user.profile.avatar_small %}
+              <img src="{{ user.profile.avatar_small.url }}" class="found-avatar" id="imgUser">
+            {% else %}
+              <img src="/static/img/small/avatar/standard.png" class="found-avatar" id="imgUser">
+            {% endif %}
+            
+            {% if chat_room.user1 == user %}
+              <p class="found-user-username" id="usernameUser">{{ chat_room.user2.username }}</p>
+            {% else %}
+              <p class="found-user-username" id="usernameUser">{{ chat_room.user1.username }}</p>
+            {% endif %}
           </li>
-        {%endfor%}
+        {% endfor %}
         {%if not chats%}
         <p class="start-chat">Начните с кем-то общаться!</p>
         {%endif%}
@@ -107,12 +116,124 @@
 
   <script src="/static/js/stickers-fill.js"></script>
   <script src="//code.jquery.com/jquery-2.0.2.min.js"></script>
-  <script src="/socket.io/socket.io.js"></script>
   <script src="/static/js/messenger_constants.js"></script>
-  <script src="/static/js/sockets.js"></script>
+  <!-- <script src="/static/js/sockets.js"></script> -->
   <script src="/static/js/messenger.js"></script>
-  <script src="/static/js/parseDate.js"></script>
+  <!-- <script src="/static/js/parseDate.js"></script> -->
   <script src="/static/js/sweetalert2.all.min.js"></script>
+
+  <script>
+  $("#divUser").on('click', function(element) {
+    let username = element.currentTarget.attributes.username.value;
+    chatInfoImg.style = "display: box"
+    nameHref.href = `/user/${username}`
+    imgHref.href = `/user/${username}`
+
+    img_el = element.currentTarget.getElementsByTagName('img');
+    chatInfoImg.src = img_el[0].src
+    
+    let id_user = element.currentTarget.attributes.id.value;
+    
+    chatInfoName.innerText = username
+
+    writeTo = id_user;
+
+
+    const roomIdentifier = element.currentTarget.getAttribute('id_dialog');
+    // Establish WebSocket connection with the chat room using the room identifier
+    establishWebSocketConnection(roomIdentifier);
+
+
+    fetch(`/chat/get-messages/${id_user}`, {
+      method: "get",
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+    })
+    .then(response => response.json())
+    .then(result => {
+      addMessages(result, id_user)
+    })
+    
+    messageInput.click();
+    });
+  </script>
+
+
+
+  <script>
+    
+    $('ul').on('click','li',function(element){
+    let username = element.currentTarget.attributes.username.value;
+    chatInfoImg.style = "display: box"
+    nameHref.href = `/user/${username}`
+    imgHref.href = `/user/${username}`
+
+    img_el = element.currentTarget.getElementsByTagName('img');
+    chatInfoImg.src = img_el[0].src
+    
+    let id_user = element.currentTarget.attributes.id.value;
+    
+    chatInfoName.innerText = username
+
+    writeTo = id_user;
+
+    const roomIdentifier = element.currentTarget.getAttribute('id_dialog');
+
+    // Establish WebSocket connection with the chat room using the room identifier
+    establishWebSocketConnection(roomIdentifier);
+
+    fetch(`/chat/get-messages/${id_user}`, {
+      method: "get",
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+    })
+    .then(response => response.json())
+    .then(result => {
+      addMessages(result, id_user)
+    })
+    
+    messageInput.click();
+    });
+    
+      </script>
+    
+      <script>
+        USERNAME = '{{user.username}}'
+        $("#searchInput").on('input', function() {
+          const searchInput = document.getElementById('searchInput');
+          // const divUser = document.getElementById('divUser');
+          const imgUser = document.getElementById('imgUser');
+          const usernameUser = document.getElementById('usernameUser');
+    
+          divUser.style = "display: none;";
+          if (searchInput.value.length > 1 && searchInput.value.length <= 20) {
+            fetch(`${window.location.origin}/recommendation/find/${searchInput.value}`, {
+              method: "get",
+              headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+              },
+            })
+            .then(response => response.json())
+            .then(result => {
+              result = result.user
+              if (result == undefined) return
+              if (USERNAME == result.username) return
+              divUser.style = "display: flex;";
+              divUser.id = `${result.id}`;
+              divUser.setAttribute('username', `${result.username}`)
+              if (result.avatar) imgUser.src = `/static/img/small/avatar/${result.id}.jpg`;
+              else imgUser.src = `/static/img/small/avatar/standard.png`;
+              usernameUser.textContent = result.username;
+            })
+          }
+        });
+      </script>
+
 
   {%if interlocutor%}
   <script>
@@ -130,5 +251,101 @@
       else stickerMenu.style = "display: none;"
     }
   </script>
+
+
+<script>
+
+function establishWebSocketConnection(roomIdentifier) {
+  const socketProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+  const socketURL = `${socketProtocol}//${window.location.host}/ws/socket-server/`;
+
+  const socket = new WebSocket(socketURL);
+  
+  // Handle WebSocket events
+  socket.onopen = () => {
+    console.log('WebSocket connection established');
+    // Perform any necessary operations after the connection is established
+  };
+  
+  socket.onmessage = (event) => {
+    // Handle incoming messages from the server
+    const message = event.data;
+    // Process and display the received message
+  };
+  
+  socket.onclose = () => {
+    console.log('WebSocket connection closed');
+    // Perform any necessary operations after the connection is closed
+  };
+  
+  socket.onerror = (error) => {
+    console.error('WebSocket error:', error);
+    // Handle any WebSocket errors
+  };
+}
+
+  
+// // Establish WebSocket connection
+// const protocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
+// let roomName = '#'; // Replace with the actual room identifier
+
+// let chatSocket = new WebSocket(
+//   `wss://${window.location.host}/ws/chat/${roomName}/`
+// );
+
+// // Handle WebSocket connection open event
+// chatSocket.onopen = (event) => {
+//   console.log('WebSocket connection established.');
+// };
+
+// // Handle WebSocket connection close event
+// chatSocket.onclose = (event) => {
+//   console.log('WebSocket connection closed.');
+// };
+
+// // Handle incoming WebSocket messages
+// chatSocket.onmessage = (event) => {
+//   const data = JSON.parse(event.data);
+//   const message = data.message;
+//   const senderId = data.sender_id;
+//   const receiverId = data.receiver_id;
+
+//   // Process the incoming message
+//   // For example, append the message to the chat interface
+//   const chatContainer = document.querySelector('.chat-container');
+//   const messageElement = document.createElement('div');
+//   messageElement.innerText = message;
+//   chatContainer.appendChild(messageElement);
+// };
+
+// // Send message to WebSocket server
+// function sendMessage(message, senderId, receiverId) {
+//   const data = {
+//     message: message,
+//     sender_id: senderId,
+//     receiver_id: receiverId,
+//   };
+
+//   // Send the message data as a JSON string to the WebSocket server
+//   chatSocket.send(JSON.stringify(data));
+// }
+
+// // Example usage: Sending a message
+// const sendButton = document.querySelector('.imgSend');
+
+// sendButton.addEventListener('click', () => {
+//   const message = messageInput.value;
+//   const senderId = 1; // Replace with the actual sender ID
+//   const receiverId = 2; // Replace with the actual receiver ID
+
+//   // Call the sendMessage function to send the message to the WebSocket server
+//   sendMessage(message, senderId, receiverId);
+
+//   // Clear the input field
+//   messageInput.value = '';
+// });
+
+  
+</script>
   </body>
 </html>
