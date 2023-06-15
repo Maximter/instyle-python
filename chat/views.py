@@ -11,12 +11,26 @@ def index(request):
     user = get_user_by_token(request.COOKIES.get('instyle_token'))
     profile = UserProfile.objects.get(user=user)
     chat_rooms = ChatRoom.objects.filter(Q(user1=user) | Q(user2=user))
-    
     context = {
         'user': user,
         'profile': profile,
-        'chats': chat_rooms,
+        'chats': []
     }
+    for chat_room in chat_rooms:
+        if user == chat_room.user1:
+            avatar_user = UserProfile.objects.filter((~Q(avatar_small = '') & ~Q(avatar_small = 'static/img/small/avatar/standard.png')) & Q(user=chat_room.user2))
+            username = chat_room.user2.username
+            user_id = chat_room.user2.id
+        else:
+            avatar_user = UserProfile.objects.filter((~Q(avatar_small = '') & ~Q(avatar_small = 'static/img/small/avatar/standard.png')) & Q(user=chat_room.user1))
+            username = chat_room.user1.username
+            user_id = chat_room.user1.id
+        context['chats'].append({
+            'room_identifier': chat_room.room_identifier,
+            'username': username,
+            'user_id': user_id,
+            'avatar': avatar_user,
+        })
     return render(request, 'chat/index.html', context=context)
 
 def send_message_view(request):

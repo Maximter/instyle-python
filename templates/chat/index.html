@@ -8,6 +8,7 @@
     <link rel="shortcut icon" type="image/x-icon"  href="{% static "img/system/title-logo.png" %}" />
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/lazyload@2.0.0-rc.2/lazyload.js"></script>
+    <link rel="stylesheet" media="all and (orientation:portrait)" href="{% static "css/chat-mobile.css" %}">
   </head>
   <body>
     <header>
@@ -43,33 +44,25 @@
         </section>
         
         {% for chat_room in chats %}
-        {% if chat_room.user1 == user %}
-          <li class="div-found-user" id_dialog="{{chat_room.room_identifier}}" username="{{chat_room.user2.username}}" id="{{chat_room.user2.id}}">
-        {% else %}
-          <li class="div-found-user" id_dialog="{{chat_room.room_identifier}}" username="{{chat_room.user1.username}}" id="{{chat_room.user1.id}}">
-        {% endif %}
-            
-            {% if user.profile.avatar_small %}
-              <img src="{{ user.profile.avatar_small.url }}" class="found-avatar" id="imgUser">
-            {% else %}
-              <img src="/static/img/small/avatar/standard.png" class="found-avatar" id="imgUser">
-            {% endif %}
-            
-            {% if chat_room.user1 == user %}
-              <p class="found-user-username" id="usernameUser">{{ chat_room.user2.username }}</p>
-            {% else %}
-              <p class="found-user-username" id="usernameUser">{{ chat_room.user1.username }}</p>
-            {% endif %}
-          </li>
-        {% endfor %}
+        <li class="div-found-user" id_dialog="{{ chat_room.room_identifier }}" username="{{ chat_room.username }}" id="{{ chat_room.user_id }}">
+          {% if chat_room.avatar %}
+            <img src="/static/img/small/avatar/{{chat_room.user_id}}.jpg" class="found-avatar" id="imgUser">
+          {% else %}
+            <img src="/static/img/small/avatar/standard.png" class="found-avatar" id="imgUser">
+          {% endif %}
+          <p class="found-user-username" id="usernameUser">{{ chat_room.username }}</p>
+        </li>
+      {% endfor %}
+      
         {%if not chats%}
         <p class="start-chat">Начните с кем-то общаться!</p>
         {%endif%}
       </ul>
 
-      <div class="chatBox">
+      <div class="chatBox" id="chatBox">
           <div class="chatInfo" id="chatInfo">
               <div class="chatInfoBlock">
+                <img src="/static/img/system/back.svg" class="backArrow" onclick="mobile_back()" id="backArrow" style="display: none;">
                   <a href="/user/{{interlocutor.username}}" id="nameHref"><p class="chatInfoName" id="chatInfoName">{{interlocutor.name_lastname}}</p></a>
                   <div>
                       <div id="typing"></div>
@@ -96,7 +89,7 @@
                   <li class="message interlocutor" id_message="{{this.id}}"></li>
                 {%endif%}
                       <p>{{this.content}}</p>
-                      <date style="font-size:12px; color: #000">{{this.sent_date}}</date>
+                      <date style="color: #000">{{this.sent_date}}</date>
                   </li>
                 {%endfor%}
               </ul>
@@ -117,8 +110,11 @@
   <script src="/static/js/stickers-fill.js"></script>
   <script src="//code.jquery.com/jquery-2.0.2.min.js"></script>
   <script src="/static/js/messenger_constants.js"></script>
+  <script>
+    ID = '{{user.id}}'
+  </script>
   <!-- <script src="/static/js/sockets.js"></script> -->
-  <script src="/static/js/messenger.js"></script>
+
   <!-- <script src="/static/js/parseDate.js"></script> -->
   <script src="/static/js/sweetalert2.all.min.js"></script>
 
@@ -155,6 +151,12 @@
     .then(result => {
       addMessages(result, id_user)
     })
+
+    if(window.innerHeight > window.innerWidth){
+      outputChats.style = 'display: none;'
+      chatBox.style = 'display: unset;'
+      backArrow.style = 'display: unset;'
+    }
     
     messageInput.click();
     });
@@ -163,6 +165,13 @@
 
 
   <script>
+
+    function mobile_back() {
+      outputChats.style = 'display: unset;'
+      chatBox.style = 'display: none;'
+    }
+
+    let roomIdentifier
     
     $('ul').on('click','li',function(element){
     let username = element.currentTarget.attributes.username.value;
@@ -179,10 +188,16 @@
 
     writeTo = id_user;
 
-    const roomIdentifier = element.currentTarget.getAttribute('id_dialog');
+    roomIdentifier = element.currentTarget.getAttribute('id_dialog');
 
     // Establish WebSocket connection with the chat room using the room identifier
     establishWebSocketConnection(roomIdentifier);
+
+    if(window.innerHeight > window.innerWidth){
+      outputChats.style = 'display: none;'
+      chatBox.style = 'display: unset;'
+      backArrow.style = 'display: unset;'
+    }
 
     fetch(`/chat/get-messages/${id_user}`, {
       method: "get",
@@ -252,100 +267,44 @@
     }
   </script>
 
+<script src="/static/js/messenger.js"></script>
 
 <script>
+let socket
 
 function establishWebSocketConnection(roomIdentifier) {
   const socketProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
   const socketURL = `${socketProtocol}//${window.location.host}/ws/socket-server/`;
 
-  const socket = new WebSocket(socketURL);
+  socket = new WebSocket(socketURL);
   
   // Handle WebSocket events
   socket.onopen = () => {
     console.log('WebSocket connection established');
-    // Perform any necessary operations after the connection is established
+    ACTIVESEND = true;
   };
   
   socket.onmessage = (event) => {
     // Handle incoming messages from the server
-    const message = event.data;
-    // Process and display the received message
+    const data = JSON.parse(event.data);
+    if (data.type == 'message') get_message(data)
+    else CHANNEL = data.channel
   };
   
   socket.onclose = () => {
     console.log('WebSocket connection closed');
-    // Perform any necessary operations after the connection is closed
+    ACTIVESEND = false;
+    establishWebSocketConnection(roomIdentifier);
   };
   
   socket.onerror = (error) => {
     console.error('WebSocket error:', error);
-    // Handle any WebSocket errors
+    ACTIVESEND = false;
   };
 }
-
-  
-// // Establish WebSocket connection
-// const protocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
-// let roomName = '#'; // Replace with the actual room identifier
-
-// let chatSocket = new WebSocket(
-//   `wss://${window.location.host}/ws/chat/${roomName}/`
-// );
-
-// // Handle WebSocket connection open event
-// chatSocket.onopen = (event) => {
-//   console.log('WebSocket connection established.');
-// };
-
-// // Handle WebSocket connection close event
-// chatSocket.onclose = (event) => {
-//   console.log('WebSocket connection closed.');
-// };
-
-// // Handle incoming WebSocket messages
-// chatSocket.onmessage = (event) => {
-//   const data = JSON.parse(event.data);
-//   const message = data.message;
-//   const senderId = data.sender_id;
-//   const receiverId = data.receiver_id;
-
-//   // Process the incoming message
-//   // For example, append the message to the chat interface
-//   const chatContainer = document.querySelector('.chat-container');
-//   const messageElement = document.createElement('div');
-//   messageElement.innerText = message;
-//   chatContainer.appendChild(messageElement);
-// };
-
-// // Send message to WebSocket server
-// function sendMessage(message, senderId, receiverId) {
-//   const data = {
-//     message: message,
-//     sender_id: senderId,
-//     receiver_id: receiverId,
-//   };
-
-//   // Send the message data as a JSON string to the WebSocket server
-//   chatSocket.send(JSON.stringify(data));
-// }
-
-// // Example usage: Sending a message
-// const sendButton = document.querySelector('.imgSend');
-
-// sendButton.addEventListener('click', () => {
-//   const message = messageInput.value;
-//   const senderId = 1; // Replace with the actual sender ID
-//   const receiverId = 2; // Replace with the actual receiver ID
-
-//   // Call the sendMessage function to send the message to the WebSocket server
-//   sendMessage(message, senderId, receiverId);
-
-//   // Clear the input field
-//   messageInput.value = '';
-// });
-
   
 </script>
+
+
   </body>
 </html>

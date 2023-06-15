@@ -59,7 +59,7 @@ class User(models.Model,):
         db_table = 'user'
 
 
-class UserProfile(models.Model,):
+class UserProfile(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='profile')
     bio = models.CharField(max_length=300, default='')
     avatar_small = models.ImageField(upload_to=upload_small_avatar, default='static/img/small/avatar/standard.png', blank=False)

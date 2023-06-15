@@ -270,14 +270,14 @@
     get_followings.onclick = () => {
      let htmlText = '<ul style="background: #fff; ">';
       for (let i = 0; i < followings_info.length; i++) {
-        htmlText += `<a href="/user/${followings_info[i][0]}" style="display: flex; background: #fff;">
+        htmlText += `<a href="/user/${followings_info[i][0]}" style="display: flex; background: #fff; justify-content: center; flex-direction: column;">
                     <li style="display: flex; height: 70px; padding: 7px; background: #fff; border-radius: 5px">
                       <img src="/static/img/medium/avatar/${followings_info[i][3]}.png" style="width: 50px; height: 50px; object-fit: cover; border-radius: 50%;">
                       <p style="margin-left: 20px; background: #fff">${followings_info[i][0]}</p>
                     </li>
-                    </a>
-                    </ul>`      
+                    </a>`      
       }
+      htmlText += '</ul>'
 
       Swal.fire({
         title: 'Подписки',
@@ -293,7 +293,7 @@
         get_followers.onclick = () => {
       let htmlText = '<ul style="background: #fff">';
       for (let i = 0; i < followers_info.length; i++) {
-        htmlText += `<div style="display: flex; background: #fff;">
+        htmlText += `<div style="display: flex; background: #fff; justify-content: center; flex-direction: column;">
                     <li style="display: flex; height: 70px; padding: 7px;  width: 400px; background: #fff; border-radius: 5px">
                       <a href="/user/${followers_info[i][0]}" style="display: flex; background: #fff;">
                         <img src="/static/img/medium/avatar/${followers_info[i][3]}.png" style="width: 50px; height: 50px; object-fit: cover; border-radius: 50%;">
@@ -303,9 +303,9 @@
                         {% csrf_token %}
                         <button class="unfollow-button">Отписать</button>
                       </form>
-                    </li>
-                    </ul>`      
+                    </li>`      
       }
+      htmlText += '</ul>'
 
       Swal.fire({
         title: 'Подписчики',
@@ -320,14 +320,14 @@
      get_followers.onclick = () => {
       let htmlText = '<ul style="background: #fff">';
       for (let i = 0; i < followers_info.length; i++) {
-        htmlText += `<a href="/user/${followers_info[i][0]}" style="display: flex; background: #fff;">
+        htmlText += `<a href="/user/${followers_info[i][0]}" style="display: flex; background: #fff; justify-content: center; flex-direction: column;">
                     <li style="display: flex; height: 70px; padding: 7px; background: #fff; border-radius: 5px">
                       <img src="/static/img/medium/avatar/${followers_info[i][3]}.png" style="width: 50px; height: 50px; object-fit: cover; border-radius: 50%;">
                       <p style="margin-left: 20px; background: #fff">${followers_info[i][0]}</p>
                     </li>
-                    </a>
-                    </ul>`      
+                    </a>`      
       }
+      htmlText += '</ul>'
 
       Swal.fire({
         title: 'Подписчики',
