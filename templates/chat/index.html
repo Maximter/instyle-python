@@ -37,14 +37,14 @@
         <section class="find-section">
           <h2>Поиск</h2>
           <input type="text" placeholder="Введите никнейм пользователя" class="input-find" id="searchInput">
-            <div href="#" class="div-found-user" style="display: none;" id="divUser">
+            <div href="#" onclick="open_chat(this)"  class="div-found-user" style="display: none;" id="divUser">
               <img src="#" class="found-avatar" id="imgUser">
               <p class="found-user-username" id="usernameUser"></p>
             </div>
         </section>
         
         {% for chat_room in chats %}
-        <li class="div-found-user" id_dialog="{{ chat_room.room_identifier }}" username="{{ chat_room.username }}" id="{{ chat_room.user_id }}">
+        <li class="div-found-user" onclick="open_chat(this)" id_dialog="{{ chat_room.room_identifier }}" username="{{ chat_room.username }}" id="{{ chat_room.user_id }}">
           {% if chat_room.avatar %}
             <img src="/static/img/small/avatar/{{chat_room.user_id}}.jpg" class="found-avatar" id="imgUser">
           {% else %}
@@ -112,33 +112,45 @@
   <script src="/static/js/messenger_constants.js"></script>
   <script>
     ID = '{{user.id}}'
-  </script>
-  <!-- <script src="/static/js/sockets.js"></script> -->
-
-  <!-- <script src="/static/js/parseDate.js"></script> -->
+  </script> 
+  <script src="/static/js/parseDate.js"></script>
   <script src="/static/js/sweetalert2.all.min.js"></script>
 
+
+
   <script>
-  $("#divUser").on('click', function(element) {
-    let username = element.currentTarget.attributes.username.value;
+    function open_chat(element) {
+    outputMessage.innerHTML = ''
+    let username = element.attributes.username.value;
     chatInfoImg.style = "display: box"
     nameHref.href = `/user/${username}`
     imgHref.href = `/user/${username}`
 
-    img_el = element.currentTarget.getElementsByTagName('img');
+    img_el = element.getElementsByTagName('img');
     chatInfoImg.src = img_el[0].src
     
-    let id_user = element.currentTarget.attributes.id.value;
+    let id_user = element.id;
     
     chatInfoName.innerText = username
 
     writeTo = id_user;
 
+    roomIdentifier = element.getAttribute('id_dialog');
 
-    const roomIdentifier = element.currentTarget.getAttribute('id_dialog');
+    if (roomIdentifier == undefined) {
+      id_interlocutor = +element.id;
+      if (id_interlocutor > +ID) roomIdentifier = `room_${ID}_${id_interlocutor}`
+      else roomIdentifier = `room_${id_interlocutor}_${ID}`
+    }
+
     // Establish WebSocket connection with the chat room using the room identifier
     establishWebSocketConnection(roomIdentifier);
 
+    if(window.innerHeight > window.innerWidth){
+      outputChats.style = 'display: none;'
+      chatBox.style = 'display: unset;'
+      backArrow.style = 'display: unset;'
+    }
 
     fetch(`/chat/get-messages/${id_user}`, {
       method: "get",
@@ -151,68 +163,17 @@
     .then(result => {
       addMessages(result, id_user)
     })
-
-    if(window.innerHeight > window.innerWidth){
-      outputChats.style = 'display: none;'
-      chatBox.style = 'display: unset;'
-      backArrow.style = 'display: unset;'
-    }
     
     messageInput.click();
-    });
-  </script>
-
-
-
-  <script>
-
+    }
+    
     function mobile_back() {
       outputChats.style = 'display: unset;'
       chatBox.style = 'display: none;'
     }
 
-    let roomIdentifier
-    
-    $('ul').on('click','li',function(element){
-    let username = element.currentTarget.attributes.username.value;
-    chatInfoImg.style = "display: box"
-    nameHref.href = `/user/${username}`
-    imgHref.href = `/user/${username}`
-
-    img_el = element.currentTarget.getElementsByTagName('img');
-    chatInfoImg.src = img_el[0].src
-    
-    let id_user = element.currentTarget.attributes.id.value;
-    
-    chatInfoName.innerText = username
-
-    writeTo = id_user;
-
-    roomIdentifier = element.currentTarget.getAttribute('id_dialog');
-
-    // Establish WebSocket connection with the chat room using the room identifier
-    establishWebSocketConnection(roomIdentifier);
-
-    if(window.innerHeight > window.innerWidth){
-      outputChats.style = 'display: none;'
-      chatBox.style = 'display: unset;'
-      backArrow.style = 'display: unset;'
-    }
-
-    fetch(`/chat/get-messages/${id_user}`, {
-      method: "get",
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      },
-    })
-    .then(response => response.json())
-    .then(result => {
-      addMessages(result, id_user)
-    })
-    
-    messageInput.click();
-    });
+   
+  
     
       </script>
     
@@ -220,7 +181,6 @@
         USERNAME = '{{user.username}}'
         $("#searchInput").on('input', function() {
           const searchInput = document.getElementById('searchInput');
-          // const divUser = document.getElementById('divUser');
           const imgUser = document.getElementById('imgUser');
           const usernameUser = document.getElementById('usernameUser');
     
@@ -274,7 +234,7 @@ let socket
 
 function establishWebSocketConnection(roomIdentifier) {
   const socketProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-  const socketURL = `${socketProtocol}//${window.location.host}/ws/socket-server/`;
+  const socketURL = `${socketProtocol}//${window.location.host}/ws/${roomIdentifier}/`;
 
   socket = new WebSocket(socketURL);
   
