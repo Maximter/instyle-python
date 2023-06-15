@@ -84,6 +84,11 @@ def check_valid_update(user, user_old):
         except User.DoesNotExist:
             pass
 
+def update_privacy(visibility, user):
+    User.objects.filter(id=user.id).update(
+        message_visibility=visibility['message_visibility'])
+    return
+
 
 def update_password(passwords, user):
     if not passwords['new_pass'] == passwords['new_pass2']:

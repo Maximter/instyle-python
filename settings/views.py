@@ -1,7 +1,7 @@
 from django.shortcuts import get_object_or_404, render
 from instyle import settings
 from settings.forms import AvatarForm
-from settings.service import edit_profile_data, get_black_list, get_close_friends, get_followers_not_close, save_avatar, update_password
+from settings.service import edit_profile_data, get_black_list, get_close_friends, get_followers_not_close, save_avatar, update_password, update_privacy
 from signup.models import Token, User, UserProfile
 from signup.service import generate_password
 from user.models import CloseFriend
@@ -78,6 +78,17 @@ def favorite(request, id_user):
         close_friend = CloseFriend(user=user, friend=friend)
         close_friend.save()
     return HttpResponse()
+
+def change_privacy(request):
+    user = get_user_by_token(request.COOKIES.get('instyle_token'))
+    
+    visibility = {
+        'message_visibility': request.POST.get('message-visibility'),
+    }
+    print(visibility)
+    update_privacy(visibility, user)
+    messages.success(request, 'Настройки приватности были изменены')
+    return redirect('/settings')
 
 
 def change_password(request):

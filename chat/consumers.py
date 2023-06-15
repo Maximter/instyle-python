@@ -4,7 +4,7 @@ from asgiref.sync import async_to_sync
 
 from chat.models import ChatRoom, Message
 from signup.models import User
-from user.models import Blacklist
+from user.models import Blacklist, CloseFriend, Follow
 
 class ChatConsumer(WebsocketConsumer):
     def connect(self):
@@ -49,6 +49,17 @@ class ChatConsumer(WebsocketConsumer):
                 }
             )
             return
+        elif self.user_blocked_privacy(sender_id, receiver_id):
+            print('q')
+            async_to_sync(self.channel_layer.group_send)(
+                self.room_group_name,
+                {
+                    'type':'error',
+                    'message':'Пользователь запретил оставлять сообщения в настройках приватности',
+                    'channel_name': channel_name
+                }
+            )
+            return
         
 
         self.save_message(sender_id, receiver_id, message)
@@ -88,20 +99,37 @@ class ChatConsumer(WebsocketConsumer):
             'channel_name':channel_name
         }))
 
+
+
+    def user_blocked_privacy(self, sender_id, receiver_id):
+        user = User.objects.get(id=sender_id)
+        receiver = User.objects.get(id=receiver_id)
+
+        if receiver.message_visibility == 'all': return False
+        if receiver.message_visibility == 'nobody': return True
+        
+        if receiver.message_visibility == 'follower':
+            follow = Follow.objects.filter(follower=user, following=receiver).first()
+            if follow: return False
+            else: return True
+
+        if receiver.message_visibility == 'close_friend':
+            close_friend = CloseFriend.objects.filter(user=receiver, friend=user).first()
+            if close_friend: return False
+            else: return True
+
     def is_blocked(self, sender_id, receiver_id):
         user = User.objects.get(id=sender_id)
         receiver = User.objects.get(id=receiver_id)
         is_blocked = Blacklist.objects.filter(user=receiver, blocked_user=user).first()
-        if is_blocked:
-            return True
+        if is_blocked: return True
         return False
     
     def blocked(self, sender_id, receiver_id):
         user = User.objects.get(id=sender_id)
         receiver = User.objects.get(id=receiver_id)
         is_blocked = Blacklist.objects.filter(user=user, blocked_user=receiver).first()
-        if is_blocked:
-            return True
+        if is_blocked: return True
         return False
 
     def save_message(self, sender_id, receiver_id, message):

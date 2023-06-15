@@ -62,7 +62,7 @@
           {%endif%}
 
           {{form.as_p}}
-          <button>Изменить</button>
+          <button>Сохранить</button>
         </form>
       
 
@@ -92,7 +92,7 @@
             <input type="text" value="{{user.email}}" name="email" required>
           </div>
 
-          <button>Изменить</button>
+          <button>Сохранить</button>
         </form>
 
         <button style="margin-bottom: 20px; background:#ff3535;" onclick="window.location='/login'">Выход</button>
@@ -101,33 +101,7 @@
 
 
       <div id="div-lock"  style="display: none;">
-        <div class="name-section">
-          <h3>Черный список</h3>
-        </div>
-        <div class="block-close-friends">
-          <ul>
-            {%for this in black_list%}
-            <li>
-              <a href="/user/{{this.blocked_user.username}}" class="friend-block">
-                {%if this.avatar%}
-                  <img src="/static/img/small/avatar/{{this.blocked_user.id}}.jpg" alt="{{this.blocked_user.name_lastname}}" title="{{this.blocked_user.name_lastname}}" class="notif-avatar">
-                {%else%}
-                  <img src="/static/img/small/avatar/standard.png" alt="{{this.blocked_user.name_lastname}}" title="{{this.blocked_user.name_lastname}}" class="notif-avatar">
-                {%endif%}
-                <p class="found-user-username">{{this.blocked_user.username}}</p>
-              </a> 
 
-              <form action="/user/block/{{this.blocked_user.id}}/" method="post">
-                {% csrf_token %}
-                <button class="follow-button">Разбанить</button>
-              </form>
-              
-            </li>
-            {%endfor%}
-          </ul>
-        </div>
-
-        
         <div class="name-section">
           <h3>Список близких друзей</h3>
         </div>
@@ -189,6 +163,82 @@
             {%endif%}
           </ul>
         </div>
+
+
+        <div class="name-section">
+          <h3>Приватность</h3>
+        </div>
+        <div class="block-close-friends">
+          <form action="change-privacy" method="post">
+            {% csrf_token %}
+            <p class="name-privacy">Кто может писать личные сообщения:</p> 
+            <select name="message-visibility" class="visibility">
+              {%if user.message_visibility == 'all'%}
+              <option value="all">Все пользователи</option>
+              <option value="follower">Только подписчики</option>
+              <option value="close_friend">Только близкие друзья</option>
+              <option value="nobody">Никто</option>
+              {%endif%}
+
+              {%if user.message_visibility == 'follower'%}
+              <option value="follower">Только подписчики</option>
+              <option value="all">Все пользователи</option>
+              <option value="close_friend">Только близкие друзья</option>
+              <option value="nobody">Никто</option>
+              {%endif%}
+
+              {%if user.message_visibility == 'close_friend'%}
+              <option value="close_friend">Только близкие друзья</option>
+              <option value="all">Все пользователи</option>
+              <option value="follower">Только подписчики</option>
+              <option value="nobody">Никто</option>
+              {%endif%}
+
+              {%if user.message_visibility == 'nobody'%}
+              <option value="nobody">Никто</option>
+              <option value="all">Все пользователи</option>
+              <option value="follower">Только подписчики</option>
+              <option value="close_friend">Только близкие друзья</option>
+             
+              {%endif%}
+            </select> <br>
+
+            <button>Сохранить</button>
+          </form>
+        </div>
+
+
+        <div class="name-section">
+          <h3>Черный список</h3>
+        </div>
+        <div class="block-close-friends">
+          <ul>
+            {%for this in black_list%}
+            <li>
+              <a href="/user/{{this.blocked_user.username}}" class="friend-block">
+                {%if this.avatar%}
+                  <img src="/static/img/small/avatar/{{this.blocked_user.id}}.jpg" alt="{{this.blocked_user.name_lastname}}" title="{{this.blocked_user.name_lastname}}" class="notif-avatar">
+                {%else%}
+                  <img src="/static/img/small/avatar/standard.png" alt="{{this.blocked_user.name_lastname}}" title="{{this.blocked_user.name_lastname}}" class="notif-avatar">
+                {%endif%}
+                <p class="found-user-username">{{this.blocked_user.username}}</p>
+              </a> 
+
+              <form action="/user/block/{{this.blocked_user.id}}/" method="post">
+                {% csrf_token %}
+                <button class="follow-button">Разблокировать</button>
+              </form>
+              
+            </li>
+            {%endfor%}
+            {%if not black_list%}
+            <div class="empty">Черный список пуст</div>
+            {%endif%}
+          </ul>
+        </div>
+
+        
+       
       </div>
 
 

@@ -53,6 +53,7 @@ class User(models.Model,):
     password = models.CharField(max_length=105)
     verificated = models.BooleanField(default=False)
     registration_date = models.DateTimeField(auto_now_add=True)
+    message_visibility = models.CharField(max_length=30, default='all')
     objects = UserManager()
 
     class Meta:
