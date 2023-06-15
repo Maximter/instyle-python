@@ -4,6 +4,7 @@ from asgiref.sync import async_to_sync
 
 from chat.models import ChatRoom, Message
 from signup.models import User
+from user.models import Blacklist
 
 class ChatConsumer(WebsocketConsumer):
     def connect(self):
@@ -28,6 +29,28 @@ class ChatConsumer(WebsocketConsumer):
         receiver_id = text_data_json['receiver_id']
         channel_name = self.channel_name
 
+        if self.is_blocked(sender_id, receiver_id):
+            async_to_sync(self.channel_layer.group_send)(
+                self.room_group_name,
+                {
+                    'type':'error',
+                    'message':'Вы были заблокированы пользователем',
+                    'channel_name': channel_name
+                }
+            )
+            return
+        elif self.blocked(sender_id, receiver_id):
+            async_to_sync(self.channel_layer.group_send)(
+                self.room_group_name,
+                {
+                    'type':'error',
+                    'message':'Вы не можете писать заблокированному пользователю',
+                    'channel_name': channel_name
+                }
+            )
+            return
+        
+
         self.save_message(sender_id, receiver_id, message)
 
         async_to_sync(self.channel_layer.group_send)(
@@ -41,6 +64,18 @@ class ChatConsumer(WebsocketConsumer):
             }
         )
 
+    def error(self, event):
+        message = event['message']
+        channel_name = event['channel_name']
+
+        self.send(text_data=json.dumps({
+            'type':'error',
+            'message':message,
+            'channel_name': channel_name
+        }))
+
+    
+    
     def chat_message(self, event):
         message = event['message']
         sender_id = event['sender_id']
@@ -52,6 +87,22 @@ class ChatConsumer(WebsocketConsumer):
             'sender_id':sender_id,
             'channel_name':channel_name
         }))
+
+    def is_blocked(self, sender_id, receiver_id):
+        user = User.objects.get(id=sender_id)
+        receiver = User.objects.get(id=receiver_id)
+        is_blocked = Blacklist.objects.filter(user=receiver, blocked_user=user).first()
+        if is_blocked:
+            return True
+        return False
+    
+    def blocked(self, sender_id, receiver_id):
+        user = User.objects.get(id=sender_id)
+        receiver = User.objects.get(id=receiver_id)
+        is_blocked = Blacklist.objects.filter(user=user, blocked_user=receiver).first()
+        if is_blocked:
+            return True
+        return False
 
     def save_message(self, sender_id, receiver_id, message):
         # Find the chat room

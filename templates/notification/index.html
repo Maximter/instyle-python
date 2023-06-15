@@ -52,7 +52,7 @@
           <li class="like">
         {%endif%}
             <a href="/user/{{this.sender.username}}" class="owner-block">
-              {%if this.sender.avatar%}
+              {%if this.avatar%}
                 <img src="/static/img/small/avatar/{{this.sender.id}}.jpg" alt="{{user.name_lastname}}" title="{{user.name_lastname}}" class="notif-avatar">
               {%else%}
                 <img src="/static/img/small/avatar/standard.png" alt="{{user.name_lastname}}" title="{{user.name_lastname}}" class="notif-avatar">

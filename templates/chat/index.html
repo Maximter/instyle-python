@@ -248,7 +248,16 @@ function establishWebSocketConnection(roomIdentifier) {
     // Handle incoming messages from the server
     const data = JSON.parse(event.data);
     if (data.type == 'message') get_message(data)
-    else CHANNEL = data.channel
+    else if (data.type == 'channel') CHANNEL = data.channel
+    else {
+      if (data.channel_name == CHANNEL)
+      Swal.fire({
+        title: 'Ошибка!',
+        text: data.message,
+        icon: 'error',
+        confirmButtonText: 'Ясно'
+      })
+    }
   };
   
   socket.onclose = () => {
