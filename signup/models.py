@@ -63,8 +63,8 @@ class User(models.Model,):
 class UserProfile(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='profile')
     bio = models.CharField(max_length=300, default='')
-    avatar_small = models.ImageField(upload_to=upload_small_avatar, default='static/img/small/avatar/standard.png', blank=False)
-    avatar_big = models.ImageField(upload_to=upload_big_avatar, default='static/img/big/avatar/standard.png', blank=False)
+    avatar_small = models.ImageField(upload_to=upload_small_avatar, blank=False)
+    avatar_big = models.ImageField(upload_to=upload_big_avatar, blank=False)
     objects = UserProfileManager()
 
     class Meta:
