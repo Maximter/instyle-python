@@ -16,10 +16,7 @@
       <p class="logo-name">Instyle</p>
       <form action="/signup/create/" method="post">
         {% csrf_token %}
-        <input type="email" name="email" value="{{user.email}}" placeholder="Эл. адрес" id="email" required>
-        <input type="text" name="name_lastname" value="{{user.name_lastname}}" placeholder="Имя и фамилия" id="name_lastname" required>
-        <input type="text" name="username" value="{{user.username}}" placeholder="Имя пользователя" id="username" required>
-        <input type="password" name="password" placeholder="Пароль" id="password" required>
+        {{ form.as_p }}
         <button>Зарегистрироваться</button>
       </form>
       <p class="havent-account">Уже есть аккаунт? <a href="/login">Войти</a></p>
